@@ -13,4 +13,4 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
-export const auth = getAuth(app);
+export const auth = getAuth(app); // Firebase 인증 객체 가져오기

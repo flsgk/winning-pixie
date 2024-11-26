@@ -2,17 +2,20 @@ import React, { useState } from "react";
 import { auth } from "../firebase"; // Firebase 설정 가져오기
 import { createUserWithEmailAndPassword } from "firebase/auth";
 //createUserWithEmailAndPassword 는 비동기 함수
+import { useNavigate } from "react-router-dom";
 
 const Signup = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
+  const navigate = useNavigate(); // useNavigate 훅 사용
 
   const handleSignup = async (e) => {
     e.preventDefault();
     try {
       await createUserWithEmailAndPassword(auth, email, password);
       setMessage("Welcome! 회원가입 성공!");
+      navigate("/select-team"); // 로그인 성공 후 팀 선택 화면으로 이동
     } catch (error) {
       setMessage(error.message);
     }
