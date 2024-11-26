@@ -1,16 +1,20 @@
 import React, { useState } from "react";
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
+  const navigate = useNavigate();
 
   const handleLogin = async () => {
     const auth = getAuth(); // Firebase 인증 객체 가져오기
+
     try {
       await signInWithEmailAndPassword(auth, email, password); //signInWithEmailAndPassword 함수로 로그인하기
       setMessage("로그인 성공!");
+      navigate("/");
     } catch (error) {
       setMessage(error.message);
     }
