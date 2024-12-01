@@ -5,6 +5,7 @@ import Signup from "./components/Signup";
 import Login from "./components/Login.js";
 import SelectTeam from "./components/SelectTeam.js";
 import Logout from "./components/Logout.js";
+import Schedule from "./components/Schedule.js";
 
 function App() {
   const [selectedTeam, setSelectedTeam] = useState(null);
@@ -15,6 +16,7 @@ function App() {
       if (user) {
         setIsLoggedIn(true); //로그인 상태로 설정
         const savedItem = localStorage.getItem("selectedTeam");
+        console.log("Saved Team from localStorage:", savedItem);
         if (savedItem) {
           setSelectedTeam(savedItem);
         }
@@ -25,6 +27,13 @@ function App() {
     });
     return () => unsubscribe(); // firebase 리스너 해제
   }, []);
+
+  useEffect(() => {
+    // selectedTeam이 변경될 때마다 localStorage에 저장
+    if (selectedTeam) {
+      localStorage.setItem("selectedTeam", selectedTeam);
+    }
+  }, [selectedTeam]); // selectedTeam 값이 변경될 때마다 실행
 
   return (
     <Router>
@@ -48,6 +57,10 @@ function App() {
             element={<Login onLoginSuccess={() => setIsLoggedIn(true)} />}
           />{" "}
           {/* 로그인 페이지 */}
+          <Route
+            path="/schedule"
+            element={<Schedule selectedTeam={selectedTeam} />}
+          />
           <Route
             path="/signup"
             element={<Signup onSignupSuccess={() => setIsLoggedIn(true)} />}
@@ -74,12 +87,14 @@ function App() {
 
 // 홈 화면 컴포넌트
 function Home({ isLoggedIn, selectedTeam, onLogout }) {
+  console.log("Home 화면에서의 selectedTeam:", selectedTeam);
   return (
     <div>
       <h2>승리요정🧚🏻‍♀️</h2>
       {isLoggedIn ? (
         <>
           <p>나의 사랑하는 {selectedTeam}⚾️💗</p>
+          <Schedule selectedTeam={selectedTeam} />
           <Logout onLogout={onLogout} />
         </>
       ) : (

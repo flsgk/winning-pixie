@@ -3,16 +3,16 @@ import { useNavigate } from "react-router-dom";
 import "./SelectTeam.css";
 
 const teams = [
-  "두산 베어스",
-  "LG 트윈스",
-  "한화 이글스",
-  "삼성 라이온즈",
-  "KIA 타이거즈",
-  "롯데 자이언츠",
-  "NC 다이노스",
-  "키움 히어로즈",
-  "SSG 랜더스",
-  "KT 위즈",
+  { fullName: "두산 베어스", shortName: "두산" },
+  { fullName: "LG 트윈스", shortName: "LG" },
+  { fullName: "한화 이글스", shortName: "한화" },
+  { fullName: "삼성 라이온즈", shortName: "삼성" },
+  { fullName: "KIA 타이거즈", shortName: "KIA" },
+  { fullName: "롯데 자이언츠", shortName: "롯데" },
+  { fullName: "NC 다이노스", shortName: "NC" },
+  { fullName: "키움 히어로즈", shortName: "키움" },
+  { fullName: "SSG 랜더스", shortName: "SSG" },
+  { fullName: "KT 위즈", shortName: "KT" },
 ];
 
 function SelectTeam() {
@@ -21,11 +21,12 @@ function SelectTeam() {
 
   const handleSelectTeam = (team) => {
     setSelectedTeam(team);
+    console.log("Team Selected:", team);
   };
 
   const handleConfirm = () => {
     if (SelectTeam) {
-      localStorage.setItem("selectedTeam", selectedTeam);
+      localStorage.setItem("selectedTeam", selectedTeam.shortName); // shortname으로 저장된다.
       navigate("/");
     }
   };
@@ -33,7 +34,9 @@ function SelectTeam() {
   return (
     <div className="container">
       <p className="what-team">어떤 팀을 응원하시나요?</p>
-      {selectedTeam && <p className="my-team">나의 팀 : {selectedTeam}</p>}
+      {selectedTeam && (
+        <p className="my-team">나의 팀 : {selectedTeam.fullName}</p>
+      )}
       <div className="grid-container">
         {teams.map(
           (
@@ -45,7 +48,7 @@ function SelectTeam() {
               onClick={() => handleSelectTeam(team)}
               className={`button ${selectedTeam === team ? "selected" : ""}`}
             >
-              {team}
+              {team.fullName}
             </button>
           )
         )}
