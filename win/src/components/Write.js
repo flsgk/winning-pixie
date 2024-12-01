@@ -1,13 +1,41 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { addPost } from "../redux/postsSlice";
 
 function Write() {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
-  const [playDate, setPlayDate] = useState();
-  const [savedPost, setSavedPost] = useState();
+  const [playDate, setPlayDate] = useState("");
+
+  const handleTitleChange = (e) => {
+    setTitle(e.target.value);
+  };
+  const handleContentChange = (e) => {
+    setContent(e.target.value);
+  };
+  const handleDateChange = (e) => {
+    setPlayDate(e.target.value);
+  };
+
+  const handleSave = (e) => {
+    e.preventDefault();
+    const newPost = {
+      id: Date.now(), // 고유 ID
+      title,
+      content,
+      playDate,
+    };
+    dispatch(addPost(newPost)); // Redux store에 글 추가
+    navigate("/");
+  };
+
+  const handleCancel = () => {
+    navigate("/");
+  };
 
   return (
     <div>
@@ -18,18 +46,19 @@ function Write() {
             type="text"
             name="title"
             value={title}
-            onChange={changeHandler}
+            onChange={handleTitleChange}
           />
         </div>
         <br />
         <div>
           <p>내용</p>
-          <input
-            type="text"
-            name="content"
+          <textarea
             value={content}
-            onChange={changeHandler}
-          />
+            name="content"
+            cols={50}
+            rows={30}
+            onChange={handleContentChange}
+          ></textarea>
         </div>
         <br />
         <div>
@@ -38,12 +67,12 @@ function Write() {
             type="date"
             name="playDate"
             value={playDate}
-            onChange={changeHandler}
+            onChange={handleDateChange}
           />
         </div>
         <div>
-          <button>저장</button>
-          <button>취소</button>
+          <button onClick={handleSave}>저장</button>
+          <button onClick={handleCancel}>취소</button>
         </div>
       </form>
     </div>

@@ -6,17 +6,44 @@ import Login from "./components/Login.js";
 import SelectTeam from "./components/SelectTeam.js";
 import Logout from "./components/Logout.js";
 import Schedule from "./components/Schedule.js";
+import Post from "./components/Post.js";
+import { useSelector, useDispatch } from "react-redux";
+import Write from "./components/Write.js";
+import { setPosts } from "./redux/postsSlice.js";
 
 function App() {
+  const dispatch = useDispatch();
+  // posts가 배열이 아닌 경우 빈 배열로 기본값을 설정
+  const posts = useSelector((state) => state.posts.posts || []); // state.posts가 객체이기 때문에 state.posts.posts로 배열에 접근해야 한다.
   const [selectedTeam, setSelectedTeam] = useState(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  // 로컬 스토리지에서 Redux 상태 초기화
+  useEffect(() => {
+    const savedPosts = localStorage.getItem("posts");
+    if (savedPosts) {
+      // 로컬 스토리지에서 posts 데이터를 배열로 파싱
+      const parsedPosts = JSON.parse(savedPosts);
+      if (Array.isArray(parsedPosts)) {
+        dispatch(setPosts(parsedPosts)); // posts가 배열이면 Redux 상태로 설정
+      } else {
+        console.error("Posts 데이터가 배열이 아닙니다.");
+      }
+    }
+  }, [dispatch]);
+
+  // Redux 상태가 변경이 될 때마다 로컬 스토리지에 저장
+  useEffect(() => {
+    if (posts.length > 0) {
+      localStorage.setItem("posts", JSON.stringify(posts)); // posts 데이터를 로컬 스토리지에 저장
+    }
+  }, [posts]);
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
       if (user) {
         setIsLoggedIn(true); //로그인 상태로 설정
         const savedItem = localStorage.getItem("selectedTeam");
-        console.log("Saved Team from localStorage:", savedItem);
         if (savedItem) {
           setSelectedTeam(savedItem);
         }
@@ -29,16 +56,14 @@ function App() {
   }, []);
 
   useEffect(() => {
-    // selectedTeam이 변경될 때마다 localStorage에 저장
     if (selectedTeam) {
       localStorage.setItem("selectedTeam", selectedTeam);
     }
-  }, [selectedTeam]); // selectedTeam 값이 변경될 때마다 실행
+  }, [selectedTeam]);
 
   return (
     <Router>
       <div className="App">
-        {/* Routes로 각 페이지 경로 정의 */}
         <Routes>
           <Route
             path="/"
@@ -47,25 +72,23 @@ function App() {
                 isLoggedIn={isLoggedIn}
                 selectedTeam={selectedTeam}
                 onLogout={() => setIsLoggedIn(false)}
+                posts={posts} // posts를 Home 컴포넌트에 전달
               />
             }
           />
-          {/* Home 컴포넌트에 isLoggedIn, selectedTeam 데이터 전달 */}
-          {/* 홈 화면 */}
           <Route
             path="/login"
             element={<Login onLoginSuccess={() => setIsLoggedIn(true)} />}
-          />{" "}
-          {/* 로그인 페이지 */}
+          />
           <Route
             path="/schedule"
             element={<Schedule selectedTeam={selectedTeam} />}
           />
+          <Route path="/write" element={<Write />} />
           <Route
             path="/signup"
             element={<Signup onSignupSuccess={() => setIsLoggedIn(true)} />}
-          />{" "}
-          {/* 회원가입 페이지 */}
+          />
           <Route
             path="/select-team"
             element={
@@ -78,16 +101,16 @@ function App() {
               />
             }
           />
-          {/* 구단 선택 페이지 */}
         </Routes>
       </div>
     </Router>
   );
 }
 
-// 홈 화면 컴포넌트
-function Home({ isLoggedIn, selectedTeam, onLogout }) {
-  console.log("Home 화면에서의 selectedTeam:", selectedTeam);
+function Home({ isLoggedIn, selectedTeam, onLogout, posts }) {
+  // posts가 배열인지 확인 (빈 배열이 기본값)
+  console.log("posts:", posts);
+
   return (
     <div>
       <h2>승리요정🧚🏻‍♀️</h2>
@@ -95,6 +118,16 @@ function Home({ isLoggedIn, selectedTeam, onLogout }) {
         <>
           <p>나의 사랑하는 {selectedTeam}⚾️💗</p>
           <Schedule selectedTeam={selectedTeam} />
+          <div>
+            <Link to="/write">
+              <button>글쓰기</button>
+            </Link>
+          </div>
+          <div>
+            {/* posts가 배열일 때만 .map() 실행 */}
+            {Array.isArray(posts) &&
+              posts.map((post) => <Post key={post.id} post={post} />)}
+          </div>
           <Logout onLogout={onLogout} />
         </>
       ) : (
