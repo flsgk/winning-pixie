@@ -15,10 +15,12 @@ def fetch_schedule(team, year=None, month=None):
     month = month or today.month
         
         
-    url = f"http://localhost:5001/api/schedule?year=${year}&month=${month}&team=${team}"
+    url = f"https://statiz.sporki.com/schedule/?year={year}&month={month}"
     
     # HTTP 요청 및 인코딩 자동 처리
     response = requests.get(url)
+    
+    print(f"Response Status Code: {response.status_code}")
     
     # 서버가 제공한 인코딩을 그대로 사용
     response.encoding = response.apparent_encoding  # 자동으로 인코딩 감지

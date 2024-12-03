@@ -1,5 +1,6 @@
 export const fetchSchedule = (year, month, team) => {
   const apiUrl = `http://localhost:5001/api/schedule?year=${year}&month=${month}&team=${team}`;
+  console.log(apiUrl);
 
   return fetch(apiUrl) // Fetch를 사용하면 Promise를 반환
     .then((response) => {
