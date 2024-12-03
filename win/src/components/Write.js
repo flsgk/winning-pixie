@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import { addPost } from "../redux/postsSlice";
+import { addPostToFirebase } from "../redux/postsSlice";
 
 function Write() {
   const navigate = useNavigate();
@@ -24,12 +24,11 @@ function Write() {
   const handleSave = (e) => {
     e.preventDefault();
     const newPost = {
-      id: Date.now(), // 고유 ID
       title,
       content,
       playDate,
     };
-    dispatch(addPost(newPost)); // Redux store에 글 추가
+    dispatch(addPostToFirebase(newPost)); // Redux store에 글 추가
     navigate("/");
   };
 

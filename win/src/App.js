@@ -6,38 +6,22 @@ import Login from "./components/Login.js";
 import SelectTeam from "./components/SelectTeam.js";
 import Logout from "./components/Logout.js";
 import Schedule from "./components/Schedule.js";
-import Post from "./components/Post.js";
 import { useSelector, useDispatch } from "react-redux";
 import Write from "./components/Write.js";
-import { setPosts } from "./redux/postsSlice.js";
+import { fetchPosts } from "./redux/postsSlice.js";
 
 function App() {
   const dispatch = useDispatch();
   // posts가 배열이 아닌 경우 빈 배열로 기본값을 설정
   const posts = useSelector((state) => state.posts.posts || []); // state.posts가 객체이기 때문에 state.posts.posts로 배열에 접근해야 한다.
+  console.log("Redux posts:", posts); // 로그로 Redux 상태 확인
   const [selectedTeam, setSelectedTeam] = useState(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-  // 로컬 스토리지에서 Redux 상태 초기화
+  // Firebase에서 글을 가져와 Redux에 저장
   useEffect(() => {
-    const savedPosts = localStorage.getItem("posts");
-    if (savedPosts) {
-      // 로컬 스토리지에서 posts 데이터를 배열로 파싱
-      const parsedPosts = JSON.parse(savedPosts);
-      if (Array.isArray(parsedPosts)) {
-        dispatch(setPosts(parsedPosts)); // posts가 배열이면 Redux 상태로 설정
-      } else {
-        console.error("Posts 데이터가 배열이 아닙니다.");
-      }
-    }
+    dispatch(fetchPosts());
   }, [dispatch]);
-
-  // Redux 상태가 변경이 될 때마다 로컬 스토리지에 저장
-  useEffect(() => {
-    if (posts.length > 0) {
-      localStorage.setItem("posts", JSON.stringify(posts)); // posts 데이터를 로컬 스토리지에 저장
-    }
-  }, [posts]);
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
@@ -124,9 +108,16 @@ function Home({ isLoggedIn, selectedTeam, onLogout, posts }) {
             </Link>
           </div>
           <div>
-            {/* posts가 배열일 때만 .map() 실행 */}
-            {Array.isArray(posts) &&
-              posts.map((post) => <Post key={post.id} post={post} />)}
+            {posts && posts.length > 0 ? (
+              posts.map((post) => (
+                <div key={post.id}>
+                  <h4>{post.title}</h4>
+                  <p>{post.playDate}</p>
+                </div>
+              ))
+            ) : (
+              <p>게시물이 없습니다.</p>
+            )}
           </div>
           <Logout onLogout={onLogout} />
         </>

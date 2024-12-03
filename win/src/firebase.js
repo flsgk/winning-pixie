@@ -1,5 +1,6 @@
 // src/firebase.js
 import { initializeApp } from "firebase/app";
+import { getDatabase } from "firebase/database"; // Realtime Database 추가
 import { getAuth } from "firebase/auth";
 
 const firebaseConfig = {
@@ -12,5 +13,9 @@ const firebaseConfig = {
   appId: "1:394585580991:web:7f81389710f6a96280ed0a",
 };
 
+// Initialize Firebase
 const app = initializeApp(firebaseConfig);
-export const auth = getAuth(app); // Firebase 인증 객체 가져오기
+
+// Export Firebase services
+export const auth = getAuth(app);
+export const database = getDatabase(app);
