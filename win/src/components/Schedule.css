@@ -1,0 +1,15 @@
+.App {
+  text-align: center;
+  margin: 2rem;
+}
+
+.fc-event {
+  background-color: #f76c6c !important;
+  color: white !important;
+  border: none;
+}
+
+.fc-toolbar-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
