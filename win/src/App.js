@@ -5,7 +5,7 @@ import Signup from "./components/Signup";
 import Login from "./components/Login.js";
 import SelectTeam from "./components/SelectTeam.js";
 import Logout from "./components/Logout.js";
-import Schedule from "./components/Schedule.js";
+import Schedule from "./components/Schedule.jsx";
 import { useSelector, useDispatch } from "react-redux";
 import Write from "./components/Write.js";
 import { fetchPosts } from "./redux/postsSlice.js";
