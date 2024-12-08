@@ -101,7 +101,7 @@ function Home({ isLoggedIn, selectedTeam, onLogout, posts }) {
       {isLoggedIn ? (
         <>
           <p>나의 사랑하는 {selectedTeam}⚾️💗</p>
-          <Schedule selectedTeam={selectedTeam} />
+          {selectedTeam && <Schedule selectedTeam={selectedTeam} />}
           <div>
             <Link to="/write">
               <button>글쓰기</button>
