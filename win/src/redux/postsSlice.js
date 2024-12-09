@@ -1,7 +1,7 @@
 // postsSlice.js (Redux Slice 만들기)
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit"; // createAsyncThunk : 비동기 작업 처리를 도와주는 함수
 import { database } from "../firebase";
-import { onValue, ref, set, get, child } from "firebase/database";
+import { ref, set, get } from "firebase/database";
 
 // firebase에서 글 가져오기 (onValue 사용 시 데이터가 배열에 반복적으로 추가할 위험이 있어 get 사용하도록 수정)
 export const fetchPosts = createAsyncThunk("posts/fetchPosts", async () => {
@@ -38,8 +38,13 @@ export const addPostToFirebase = createAsyncThunk(
 const postsSlice = createSlice({
   name: "posts",
   // 초기 상태 구조 변경하기
-  initialState: { posts: [], loading: false, error: null },
-  reducers: {},
+  initialState: { posts: [], selectedDate: null, loading: false, error: null },
+  reducers: {
+    setSelectedDate(state, action) {
+      // 날짜를 업데이트하는 액션 생성
+      state.selectedDate = action.payload; // 선택된 날짜 업데이트
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(fetchPosts.pending, (state) => {
@@ -60,4 +65,5 @@ const postsSlice = createSlice({
   },
 });
 
-export default postsSlice.reducer; // 리듀서를 기본값으로 내보냄
+export const { setSelectedDate } = postsSlice.actions; // 날짜 설정 액션
+export default postsSlice.reducer;

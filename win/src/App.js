@@ -4,11 +4,12 @@ import { auth } from "./firebase"; // auth 가져오기
 import Signup from "./components/Signup";
 import Login from "./components/Login.js";
 import SelectTeam from "./components/SelectTeam.js";
-import Logout from "./components/Logout.js";
 import Schedule from "./components/Schedule.jsx";
 import { useSelector, useDispatch } from "react-redux";
 import Write from "./components/Write.js";
 import { fetchPosts } from "./redux/postsSlice.js";
+import PostList from "./components/PostList.js";
+import Home from "./components/Home.js";
 
 function App() {
   const dispatch = useDispatch();
@@ -68,6 +69,7 @@ function App() {
             path="/schedule"
             element={<Schedule selectedTeam={selectedTeam} />}
           />
+
           <Route path="/write" element={<Write />} />
           <Route
             path="/signup"
@@ -85,56 +87,11 @@ function App() {
               />
             }
           />
+          <Route path="/post/:date" element={<PostList />} />
+          {/* 날짜별 글 보기 */}
         </Routes>
       </div>
     </Router>
-  );
-}
-
-function Home({ isLoggedIn, selectedTeam, onLogout, posts }) {
-  // posts가 배열인지 확인 (빈 배열이 기본값)
-  console.log("posts:", posts);
-
-  return (
-    <div>
-      <h2>승리요정🧚🏻‍♀️</h2>
-      {isLoggedIn ? (
-        <>
-          <p>나의 사랑하는 {selectedTeam}⚾️💗</p>
-          {selectedTeam && <Schedule selectedTeam={selectedTeam} />}
-          <div>
-            <Link to="/write">
-              <button>글쓰기</button>
-            </Link>
-          </div>
-          <div>
-            {posts && posts.length > 0 ? (
-              posts.map((post) => (
-                <div key={post.id}>
-                  <h4>{post.title}</h4>
-                  <p>{post.playDate}</p>
-                </div>
-              ))
-            ) : (
-              <p>게시물이 없습니다.</p>
-            )}
-          </div>
-          <Logout onLogout={onLogout} />
-        </>
-      ) : (
-        <>
-          <p>로그인 또는 회원가입을 진행해주세요.</p>
-          <nav>
-            <Link to="/login">
-              <button>로그인</button>
-            </Link>
-            <Link to="/signup">
-              <button>회원가입</button>
-            </Link>
-          </nav>
-        </>
-      )}
-    </div>
   );
 }
 

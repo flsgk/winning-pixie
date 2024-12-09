@@ -5,7 +5,6 @@ import interactionPlugin from "@fullcalendar/interaction";
 import "./Schedule.css";
 
 // API 호출 함수
-
 const fetchSchedule = async (year, month, team) => {
   const apiUrl = `http://localhost:5001/api/schedule?year=${year}&month=${month}&team=${team}`;
   try {
@@ -20,10 +19,18 @@ const fetchSchedule = async (year, month, team) => {
   }
 };
 
-function Schedule({ selectedTeam }) {
-  const [events, setEvents] = useState([]);
+function Schedule({ selectedTeam, onDateClick }) {
+  const [events, setEvents] = useState(null);
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [error, setError] = useState(null);
+  const [selectedDate, setSelectedDate] = useState(null);
+
+  // 날짜 클릭 핸들러
+  const handleDateClick = (dateInfo) => {
+    setSelectedDate(dateInfo.dateStr);
+    onDateClick(dateInfo.dateStr); // 부모로부터 전달받은 onDateClick 호출
+    console.log("Selected Date:", selectedDate); // 클릭한 날짜가 제대로 출력되는지 확인
+  };
 
   const updateEvents = async (year, month) => {
     try {
@@ -46,6 +53,7 @@ function Schedule({ selectedTeam }) {
   };
 
   useEffect(() => {
+    if (!selectedTeam) return;
     // 초기 로드 시 현재 월의 데이터를 가져오도록
     const year = currentMonth.getFullYear();
     const month = currentMonth.getMonth() + 1;
@@ -76,6 +84,7 @@ function Schedule({ selectedTeam }) {
           right: "dayGridMonth, dayGridWeek",
         }}
         datesSet={handleDatesSet}
+        dateClick={handleDateClick} // dateClick 핸들러에서 onDateClick 호출
       />
     </div>
   );
