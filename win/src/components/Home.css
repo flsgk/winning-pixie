@@ -1,0 +1,11 @@
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.button-container {
+  display: flex; /* 버튼을 가로로 배치 */
+  gap: 16px; /* 버튼 간의 간격 */
+  justify-content: center; /* 중앙 정렬 (선택 사항) */
+}

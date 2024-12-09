@@ -3,6 +3,8 @@ import { Link, useNavigate } from "react-router-dom";
 import Schedule from "./Schedule.jsx";
 import PostList from "./PostList"; // 추가
 import Logout from "./Logout";
+import Button from "@mui/material/Button";
+import "./Home.css";
 
 function Home({ isLoggedIn, selectedTeam, onLogout, posts }) {
   const navigate = useNavigate();
@@ -15,8 +17,8 @@ function Home({ isLoggedIn, selectedTeam, onLogout, posts }) {
   };
 
   return (
-    <div>
-      <h2>승리요정🧚🏻‍♀️</h2>
+    <div className="container">
+      <h1>승리요정🧚🏻‍♀️</h1>
       {isLoggedIn ? (
         <>
           <p>나의 사랑하는 {selectedTeam}⚾️💗</p>
@@ -43,12 +45,18 @@ function Home({ isLoggedIn, selectedTeam, onLogout, posts }) {
         <>
           <p>로그인 또는 회원가입을 진행해주세요.</p>
           <nav>
-            <Link to="/login">
-              <button>로그인</button>
-            </Link>
-            <Link to="/signup">
-              <button>회원가입</button>
-            </Link>
+            <div className="button-container">
+              <Link to="/login">
+                <Button variant="contained" className="Button">
+                  Login
+                </Button>
+              </Link>
+              <Link to="/signup">
+                <Button variant="contained" className="Button">
+                  Sign Up
+                </Button>
+              </Link>
+            </div>
           </nav>
         </>
       )}
