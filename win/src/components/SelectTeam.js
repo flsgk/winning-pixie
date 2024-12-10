@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { auth, database } from "../firebase"; // Firebase 설정 가져오기
-import { ref, set } from "firebase/database"; // 데이터베이스에 데이터를 저장하기 위해 필요
-import "./SelectTeam.css";
+import { ref, set, update } from "firebase/database"; // 데이터베이스에 데이터를 저장하기 위해 필요
+import "./CSS/SelectTeam.css";
 
 const teams = [
   { fullName: "두산 베어스", shortName: "두산" },
@@ -27,13 +27,13 @@ function SelectTeam() {
   };
 
   const handleConfirm = async () => {
-    if (SelectTeam) {
+    if (selectedTeam) {
       // firebase에 선택된 팀 정보 저장하기
       const userId = auth.currentUser.uid;
       const userRef = ref(database, `users/${userId}`);
 
       try {
-        await set(userRef, {
+        await update(userRef, {
           selectedTeam: selectedTeam.shortName,
         });
         // 홈 화면으로 이동

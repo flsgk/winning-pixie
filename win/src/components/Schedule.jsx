@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
-import "./Schedule.css";
+import "./CSS/Schedule.css";
 
 // API 호출 함수
 const fetchSchedule = async (year, month, team) => {

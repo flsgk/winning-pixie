@@ -30,6 +30,7 @@ const Signup = () => {
         nickname: nickname,
         fullname: fullname,
         createdAt: new Date().toISOString(),
+        selectedTeam: null,
       });
 
       setMessage("Welcome! 회원가입 성공!");
@@ -42,7 +43,7 @@ const Signup = () => {
   return (
     <div>
       <h2>회원가입</h2>
-      <form onSubmit={handleSignup}>
+      <form className="signup-form" onSubmit={handleSignup}>
         <div>
           <input
             type="text"

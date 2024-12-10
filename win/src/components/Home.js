@@ -6,7 +6,7 @@ import Schedule from "./Schedule.jsx";
 import PostList from "./PostList"; // 추가
 import Logout from "./Logout";
 import Button from "@mui/material/Button";
-import "./Home.css";
+import "./CSS/Home.css";
 
 function Home({ isLoggedIn, onLogout, posts }) {
   const navigate = useNavigate();
@@ -24,8 +24,8 @@ function Home({ isLoggedIn, onLogout, posts }) {
       onValue(userRef, (snapshot) => {
         const userData = snapshot.val();
         if (userData) {
-          setNickname(userData.nickname); // 닉네임 저장
-          setSelectedTeam(userData.selectedTeam); // 선택된 팀 저장
+          setNickname(userData.nickname || "사용자"); // 닉네임 저장
+          setSelectedTeam(userData.selectedTeam || "미선택"); // 선택된 팀 저장
         }
       });
     }
