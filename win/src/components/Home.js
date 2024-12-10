@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { ref, get } from "firebase/database"; // Realtime Database 메서드 추가
+import { data, Link, useNavigate } from "react-router-dom";
+import { ref, get, onValue } from "firebase/database"; // Realtime Database 메서드 추가
 import { auth, database } from "../firebase.js"; // Firebase 설정 가져오기
 import Schedule from "./Schedule.jsx";
 import PostList from "./PostList"; // 추가
@@ -8,32 +8,27 @@ import Logout from "./Logout";
 import Button from "@mui/material/Button";
 import "./Home.css";
 
-function Home({ isLoggedIn, selectedTeam, onLogout, posts }) {
+function Home({ isLoggedIn, onLogout, posts }) {
   const navigate = useNavigate();
   const [selectedDate, setSelectedDate] = useState(null);
   const [nickname, setNickname] = useState("");
+  const [selectedTeam, setSelectedTeam] = useState("");
 
   // 닉네임 가져오기
   useEffect(() => {
-    const fetchNickname = async () => {
-      if (auth.currentUser) {
-        // 현재 로그인된 사용자인지 확인
-        const userId = auth.currentUser.uid;
-        const userRef = ref(database, `users/${userId}`); // Firebase 경로 설정
-        try {
-          const snapshot = await get(userRef);
-          if (snapshot.exists()) {
-            const userData = snapshot.val(); // 데이터 값 추출
-            setNickname(userData.nickname);
-          } else {
-            console.log("no data available");
-          }
-        } catch (error) {
-          console.error("Error fetching nickname", error);
+    if (isLoggedIn) {
+      const userId = auth.currentUser.uid;
+      const userRef = ref(database, `users/${userId}`);
+
+      // firebase 사용자 데이터 실시간으로 읽어오기
+      onValue(userRef, (snapshot) => {
+        const userData = snapshot.val();
+        if (userData) {
+          setNickname(userData.nickname); // 닉네임 저장
+          setSelectedTeam(userData.selectedTeam); // 선택된 팀 저장
         }
-      }
-    };
-    fetchNickname();
+      });
+    }
   }, [isLoggedIn]); // 로그인 상태가 변경될 때만 실행
 
   // 날짜 클릭 핸들러
@@ -47,13 +42,14 @@ function Home({ isLoggedIn, selectedTeam, onLogout, posts }) {
       <h1>승리요정🧚🏻‍♀️</h1>
       {isLoggedIn ? (
         <>
-          <p>안녕하세요, {nickname ? `${nickname}님` : "사용자"}</p>
-
-          {selectedTeam && (
+          <p>안녕하세요, {nickname}님</p>
+          {selectedTeam ? (
             <Schedule
               selectedTeam={selectedTeam}
               onDateClick={handleDateClick}
             />
+          ) : (
+            <p>팀을 선택해주세요.</p>
           )}
           <div>
             <Link to="/write">
