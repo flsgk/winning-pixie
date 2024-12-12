@@ -8,7 +8,6 @@ import Schedule from "./components/Schedule.jsx";
 import { useSelector, useDispatch } from "react-redux";
 import Write from "./components/Write.js";
 import { fetchPosts } from "./redux/postsSlice.js";
-import PostList from "./components/PostList.js";
 import Home from "./components/Home.js";
 
 function App() {
@@ -87,8 +86,6 @@ function App() {
               />
             }
           />
-          <Route path="/post/:date" element={<PostList />} />
-          {/* 날짜별 글 보기 */}
         </Routes>
       </div>
     </Router>

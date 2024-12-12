@@ -3,7 +3,6 @@ import { data, Link } from "react-router-dom";
 import { ref, get, onValue } from "firebase/database"; // Realtime Database 메서드 추가
 import { auth, database } from "../firebase.js"; // Firebase 설정 가져오기
 import Schedule from "./Schedule.jsx";
-import PostList from "./PostList"; // 추가
 import Logout from "./Logout";
 import Button from "@mui/material/Button";
 import "./CSS/Home.css";
