@@ -5,10 +5,19 @@ import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import { Provider } from "react-redux";
 import store from "./redux/store";
-import { ThemeProvider, createTheme } from "@mui/material/styles";
+import {
+  ThemeProvider as MaterialThemeProvider,
+  createTheme,
+} from "@mui/material/styles";
+import {
+  CssVarsProvider as JoyCssVarsProvider,
+  extendTheme as joyExtendTheme,
+} from "@mui/joy/styles";
+import { deepmerge } from "@mui/utils";
 import CssBaseline from "@mui/material/CssBaseline";
 
-const theme = createTheme({
+// Material UI 테마
+const materialTheme = createTheme({
   palette: {
     primary: {
       main: "#F6FF8B",
@@ -22,19 +31,33 @@ const theme = createTheme({
   },
 });
 
+// Joy UI 테마
+const joyTheme = joyExtendTheme({
+  palette: {
+    primary: {
+      300: "#F6FF8B", // 누락된 값 추가
+    },
+  },
+  typography: {
+    fontFamily: `'Pretendard Variable'`,
+  },
+});
+
+// 테마 병합
+const mergedTheme = deepmerge(materialTheme, joyTheme);
+
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <Provider store={store}>
     <React.StrictMode>
-      <ThemeProvider theme={theme}>
+      <MaterialThemeProvider theme={mergedTheme}>
         <CssBaseline />
-        <App />
-      </ThemeProvider>
+        <JoyCssVarsProvider theme={mergedTheme}>
+          <App />
+        </JoyCssVarsProvider>
+      </MaterialThemeProvider>
     </React.StrictMode>
   </Provider>
 );
 
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
 reportWebVitals();
