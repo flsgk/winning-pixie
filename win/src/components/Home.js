@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { data, Link, useNavigate } from "react-router-dom";
+import { data, Link } from "react-router-dom";
 import { ref, get, onValue } from "firebase/database"; // Realtime Database 메서드 추가
 import { auth, database } from "../firebase.js"; // Firebase 설정 가져오기
 import Schedule from "./Schedule.jsx";
@@ -9,8 +9,8 @@ import Button from "@mui/material/Button";
 import "./CSS/Home.css";
 
 function Home({ isLoggedIn, onLogout, posts }) {
-  const navigate = useNavigate();
   const [selectedDate, setSelectedDate] = useState(null);
+  const [filteredPosts, setFilteredPosts] = useState([]); // 필터링된 글 목록
   const [nickname, setNickname] = useState("");
   const [selectedTeam, setSelectedTeam] = useState("");
 
@@ -34,7 +34,8 @@ function Home({ isLoggedIn, onLogout, posts }) {
   // 날짜 클릭 핸들러
   const handleDateClick = (date) => {
     setSelectedDate(date); // 클릭한 날짜 상태 업데이트
-    navigate(`/post/${date}`); // 해당 날짜로 이동
+    const filtered = posts.filter((post) => post.playDate === date);
+    setFilteredPosts(filtered);
   };
 
   return (
@@ -44,10 +45,33 @@ function Home({ isLoggedIn, onLogout, posts }) {
         <>
           <p>안녕하세요, {nickname}님</p>
           {selectedTeam ? (
-            <Schedule
-              selectedTeam={selectedTeam}
-              onDateClick={handleDateClick}
-            />
+            <>
+              <Schedule
+                selectedTeam={selectedTeam}
+                onDateClick={handleDateClick}
+              />
+
+              {/* 날짜 선택 시 글 목록 표시 */}
+              {selectedDate ? (
+                <div className="post-list-container">
+                  <h5>{selectedDate}의 승리요정을 찾고 있어요!</h5>
+                  {filteredPosts.length > 0 ? (
+                    <div className="post-cards">
+                      {filteredPosts.map((post) => (
+                        <div key={post.id} className="post-card">
+                          <h4>{post.title}</h4>
+                          <p>{post.content}</p>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p>이 날짜에 작성된 글이 없습니다.</p>
+                  )}
+                </div>
+              ) : (
+                <p>날짜를 선택하면 관련 글을 볼 수 있습니다.</p>
+              )}
+            </>
           ) : (
             <p>팀을 선택해주세요.</p>
           )}
@@ -58,11 +82,6 @@ function Home({ isLoggedIn, onLogout, posts }) {
           </div>
 
           <Logout onLogout={onLogout} />
-
-          {/* 날짜가 선택된 경우 PostList 컴포넌트에서 필터링된 글을 보여줌 */}
-          {selectedDate && (
-            <PostList selectedDate={selectedDate} posts={posts} />
-          )}
         </>
       ) : (
         <>
