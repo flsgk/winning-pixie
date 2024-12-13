@@ -10,9 +10,9 @@ CORS(app)  # CORS 허용
 # 크롤링 함수
 def fetch_schedule(team, year=None, month=None):
 
-    today = datetime(2024, 4, 1)
-    year = year or today.year
-    month = month or today.month
+    today = datetime.today()  # 현재 날짜를 가져옴
+    year = year or today.year  # 연도가 없으면 현재 연도 사용
+    month = month or today.month  # 월이 없으면 현재 월 사용
         
         
     url = f"https://statiz.sporki.com/schedule/?year={year}&month={month}"
