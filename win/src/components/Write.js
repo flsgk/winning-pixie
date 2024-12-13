@@ -7,19 +7,13 @@ function Write() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
+  // URL의 쿼리 파라미터에서 날짜 가져오기
+  const urlParmas = new URLSearchParams(window.location.search);
+  const initialDate = urlParmas.get("date") || "";
+
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
-  const [playDate, setPlayDate] = useState("");
-
-  const handleTitleChange = (e) => {
-    setTitle(e.target.value);
-  };
-  const handleContentChange = (e) => {
-    setContent(e.target.value);
-  };
-  const handleDateChange = (e) => {
-    setPlayDate(e.target.value);
-  };
+  const [playDate, setPlayDate] = useState(initialDate); // 날짜 기본 값 설정
 
   const handleSave = (e) => {
     e.preventDefault();
@@ -32,10 +26,6 @@ function Write() {
     navigate("/");
   };
 
-  const handleCancel = () => {
-    navigate("/");
-  };
-
   return (
     <div>
       <form>
@@ -45,7 +35,7 @@ function Write() {
             type="text"
             name="title"
             value={title}
-            onChange={handleTitleChange}
+            onChange={(e) => setTitle(e.target.value)}
           />
         </div>
         <br />
@@ -56,7 +46,7 @@ function Write() {
             name="content"
             cols={50}
             rows={30}
-            onChange={handleContentChange}
+            onChange={(e) => setContent(e.target.value)}
           ></textarea>
         </div>
         <br />
@@ -66,12 +56,12 @@ function Write() {
             type="date"
             name="playDate"
             value={playDate}
-            onChange={handleDateChange}
+            onChange={(e) => setPlayDate(e.target.value)}
           />
         </div>
         <div>
           <button onClick={handleSave}>저장</button>
-          <button onClick={handleCancel}>취소</button>
+          <button onClick={() => navigate("/")}>취소</button>
         </div>
       </form>
     </div>

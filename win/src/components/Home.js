@@ -13,7 +13,7 @@ function Home({ isLoggedIn, onLogout, posts }) {
   const [nickname, setNickname] = useState("");
   const [selectedTeam, setSelectedTeam] = useState("");
 
-  // 닉네임 가져오기
+  // 닉네임 및 선택된 팀 가져오기
   useEffect(() => {
     if (isLoggedIn) {
       const userId = auth.currentUser.uid;
@@ -50,10 +50,18 @@ function Home({ isLoggedIn, onLogout, posts }) {
                 onDateClick={handleDateClick}
               />
 
-              {/* 날짜 선택 시 글 목록 표시 */}
+              {/* 날짜 선택 시 글 목록 및 글쓰기 버튼 표시 */}
               {selectedDate ? (
                 <div className="post-list-container">
                   <h5>{selectedDate}의 승리요정을 찾고 있어요!</h5>
+
+                  {/* 글쓰기 버튼 - 선택된 날짜 전달 */}
+                  <div className="write-button-container">
+                    <Link to={`/write?date=${selectedDate}`}>
+                      <button>글쓰기</button>
+                    </Link>
+                  </div>
+
                   {filteredPosts.length > 0 ? (
                     <div className="post-cards">
                       {filteredPosts.map((post) => (
@@ -74,11 +82,6 @@ function Home({ isLoggedIn, onLogout, posts }) {
           ) : (
             <p>팀을 선택해주세요.</p>
           )}
-          <div>
-            <Link to="/write">
-              <button>글쓰기</button>
-            </Link>
-          </div>
 
           <Logout onLogout={onLogout} />
         </>
