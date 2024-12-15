@@ -79,20 +79,21 @@ function Schedule({ selectedTeam, onDateClick }) {
     <div>
       <h2>{selectedTeam} 경기 일정</h2>
       {error && <p style={{ color: "red" }}>{error}</p>}
-
-      <FullCalendar
-        plugins={[dayGridPlugin, interactionPlugin]}
-        initialView="dayGridMonth"
-        events={events}
-        locale="ko"
-        headerToolbar={{
-          left: "prev,next today",
-          center: "title",
-          right: "dayGridMonth, dayGridWeek",
-        }}
-        datesSet={handleDatesSet}
-        dateClick={handleDateClick} // dateClick 핸들러에서 onDateClick 호출
-      />
+      <div className="calendar-container">
+        <FullCalendar
+          plugins={[dayGridPlugin, interactionPlugin]}
+          initialView="dayGridMonth"
+          events={events}
+          locale="ko"
+          headerToolbar={{
+            left: "prev,next today",
+            center: "title",
+            right: "dayGridMonth",
+          }}
+          datesSet={handleDatesSet}
+          dateClick={handleDateClick} // dateClick 핸들러에서 onDateClick 호출
+        />
+      </div>
     </div>
   );
 }

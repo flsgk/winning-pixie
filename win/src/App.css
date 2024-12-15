@@ -1,3 +1,3 @@
-@import "~@fullcalendar/react/dist/fullcalendar.css";
-@import "~@fullcalendar/daygrid/main.css";
-@import "~@fullcalendar/interaction/main.css";
+@import "@fullcalendar/react/dist/fullcalendar.css";
+@import "@fullcalendar/daygrid/main.css";
+@import "@fullcalendar/interaction/main.css";
