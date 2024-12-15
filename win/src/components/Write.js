@@ -7,20 +7,33 @@ function Write() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  // URL의 쿼리 파라미터에서 날짜 가져오기
-  const urlParmas = new URLSearchParams(window.location.search);
-  const initialDate = urlParmas.get("date") || "";
+  // URL의 쿼리 파라미터에서 날짜, 팀 정보 가져오기
+  // URL에서 쿼리 파라미터 가져오기
+  const urlParams = new URLSearchParams(window.location.search);
+  const initialDate = urlParams.get("date") || "";
+  const initialTeams = urlParams.get("teams")
+    ? urlParams.get("teams").split(",")
+    : []; // 전달받은 팀 목록을 분리
 
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [playDate, setPlayDate] = useState(initialDate); // 날짜 기본 값 설정
+  const [teams, setTeams] = useState([...initialTeams, "기타"]); // '기타' 추가
+  const [selectedTeam, setSelectedTeam] = useState(""); // 사용자가 선택한 팀 저장
+
+  console.log(teams); // teams 배열을 확인하여 정상적으로 팀들이 전달되는지 확인
 
   const handleSave = (e) => {
     e.preventDefault();
+    if (!selectedTeam) {
+      alert("응원 구단을 선택하세요.");
+      return;
+    }
     const newPost = {
       title,
       content,
       playDate,
+      team: selectedTeam,
     };
     dispatch(addPostToFirebase(newPost)); // Redux store에 글 추가
     navigate("/");
@@ -58,6 +71,22 @@ function Write() {
             value={playDate}
             onChange={(e) => setPlayDate(e.target.value)}
           />
+        </div>
+        <br />
+        <div>
+          <p>응원구단 선택</p>
+          <select
+            name="selectedTeam"
+            value={selectedTeam}
+            onChange={(e) => setSelectedTeam(e.target.value)}
+          >
+            <option value="">선택</option>
+            {teams.map((team, index) => (
+              <option key={index} value={team}>
+                {team}
+              </option>
+            ))}
+          </select>
         </div>
         <div>
           <button onClick={handleSave}>저장</button>

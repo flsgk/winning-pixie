@@ -23,13 +23,20 @@ function Schedule({ selectedTeam, onDateClick }) {
   const [events, setEvents] = useState(null);
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [error, setError] = useState(null);
-  const [selectedDate, setSelectedDate] = useState(null);
 
   // 날짜 클릭 핸들러
   const handleDateClick = (dateInfo) => {
-    setSelectedDate(dateInfo.dateStr);
-    onDateClick(dateInfo.dateStr); // 부모로부터 전달받은 onDateClick 호출
-    console.log("Selected Date:", selectedDate); // 클릭한 날짜가 제대로 출력되는지 확인
+    const selectedDate = dateInfo.dateStr; // 클릭한 날짜
+
+    // 해당 날짜에 대한 team1, team2 데이터를 필터링
+    const clickedDateTeams = events
+      ?.filter((event) => event.start === selectedDate)
+      ?.map((event) => event.title.split(" vs "));
+
+    onDateClick({
+      date: selectedDate,
+      teams: clickedDateTeams ? clickedDateTeams.flat() : [],
+    });
   };
 
   const updateEvents = async (year, month) => {

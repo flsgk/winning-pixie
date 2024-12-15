@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { data, Link } from "react-router-dom";
-import { ref, get, onValue } from "firebase/database"; // Realtime Database 메서드 추가
+import { Link } from "react-router-dom";
+import { ref, onValue } from "firebase/database"; // Realtime Database 메서드 추가
 import { auth, database } from "../firebase.js"; // Firebase 설정 가져오기
 import Schedule from "./Schedule.jsx";
 import Logout from "./Logout";
@@ -8,10 +8,11 @@ import Button from "@mui/material/Button";
 import "./CSS/Home.css";
 
 function Home({ isLoggedIn, onLogout, posts }) {
-  const [selectedDate, setSelectedDate] = useState(null);
+  const [selectedDate, setSelectedDate] = useState(null); // 선택된 날짜
   const [filteredPosts, setFilteredPosts] = useState([]); // 필터링된 글 목록
-  const [nickname, setNickname] = useState("");
+  const [nickname, setNickname] = useState(""); // 사용자 닉네임
   const [selectedTeam, setSelectedTeam] = useState("");
+  const [selectedTeams, setSelectedTeams] = useState([]); // 선택된 팀 목록 (배열)
 
   // 닉네임 및 선택된 팀 가져오기
   useEffect(() => {
@@ -20,21 +21,24 @@ function Home({ isLoggedIn, onLogout, posts }) {
       const userRef = ref(database, `users/${userId}`);
 
       // firebase 사용자 데이터 실시간으로 읽어오기
-      onValue(userRef, (snapshot) => {
+      const unsubscribe = onValue(userRef, (snapshot) => {
         const userData = snapshot.val();
         if (userData) {
           setNickname(userData.nickname || "사용자"); // 닉네임 저장
           setSelectedTeam(userData.selectedTeam || "미선택"); // 선택된 팀 저장
         }
       });
+
+      return () => unsubscribe; // 컴포넌트 언마운트 시 리스너 해제
     }
   }, [isLoggedIn]); // 로그인 상태가 변경될 때만 실행
 
   // 날짜 클릭 핸들러
-  const handleDateClick = (date) => {
-    setSelectedDate(date); // 클릭한 날짜 상태 업데이트
+  const handleDateClick = ({ date, teams }) => {
     const filtered = posts.filter((post) => post.playDate === date);
     setFilteredPosts(filtered);
+    setSelectedDate(date); // 날짜 저장
+    setSelectedTeams(teams); // 선택된 팀 목록 저장
   };
 
   return (
@@ -57,7 +61,11 @@ function Home({ isLoggedIn, onLogout, posts }) {
 
                   {/* 글쓰기 버튼 - 선택된 날짜 전달 */}
                   <div className="write-button-container">
-                    <Link to={`/write?date=${selectedDate}`}>
+                    <Link
+                      to={`/write?date=${selectedDate}&teams=${selectedTeams.join(
+                        ","
+                      )}`}
+                    >
                       <button>글쓰기</button>
                     </Link>
                   </div>
