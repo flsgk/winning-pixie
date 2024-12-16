@@ -29,11 +29,16 @@ function Write() {
       alert("응원 구단을 선택하세요.");
       return;
     }
+
+    // 현재 날짜를 ISO 형식으로 저장 (작성일)
+    const createdDate = new Date().toLocaleDateString("ko-KR");
+
     const newPost = {
       title,
       content,
       playDate,
       team: selectedTeam,
+      createdDate,
     };
     dispatch(addPostToFirebase(newPost)); // Redux store에 글 추가
     navigate("/");

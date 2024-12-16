@@ -88,3 +88,9 @@
   border-radius: 15px;
   padding: 5px;
 }
+
+.post-date {
+  margin-top: 12px; /* 내용과 날짜 간격 추가 */
+  font-size: 12px;
+  color: rgb(168, 168, 168);
+}

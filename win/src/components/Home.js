@@ -79,6 +79,7 @@ function Home({ isLoggedIn, onLogout, posts }) {
                             <p className="post-team">{post.team}</p>
                           </div>
                           <p>{post.content}</p>
+                          <p className="post-date">작성일:{post.createdDate}</p>
                         </div>
                       ))}
                     </div>
