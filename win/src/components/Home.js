@@ -74,7 +74,10 @@ function Home({ isLoggedIn, onLogout, posts }) {
                     <div className="post-cards">
                       {filteredPosts.map((post) => (
                         <div key={post.id} className="post-card">
-                          <h4>{post.title}</h4>
+                          <div className="post-header">
+                            <h4>{post.title}</h4>
+                            <p className="post-team">{post.team}</p>
+                          </div>
                           <p>{post.content}</p>
                         </div>
                       ))}

@@ -67,3 +67,24 @@
   font-size: 1rem;
   color: #666;
 }
+
+.post-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.post-header h4 {
+  margin: 0;
+  font-size: 1.25em;
+}
+
+.post-header .post-team {
+  margin: 0;
+  font-size: 1em;
+  color: white;
+  background-color: black;
+  border: none;
+  border-radius: 15px;
+  padding: 5px;
+}
