@@ -13,6 +13,8 @@ function Home({ isLoggedIn, onLogout, posts }) {
   const [nickname, setNickname] = useState(""); // 사용자 닉네임
   const [selectedTeam, setSelectedTeam] = useState("");
   const [selectedTeams, setSelectedTeams] = useState([]); // 선택된 팀 목록 (배열)
+  const [selectedTeamFilter, setSelectedTeamFilter] = useState(""); // 글 필터링 상태
+  const [displayedPosts, setDisplayedPosts] = useState([]); // 화면에 표시되는 필터링된 글 목록
 
   // 닉네임 및 선택된 팀 가져오기
   useEffect(() => {
@@ -39,7 +41,31 @@ function Home({ isLoggedIn, onLogout, posts }) {
     setFilteredPosts(filtered);
     setSelectedDate(date); // 날짜 저장
     setSelectedTeams(teams); // 선택된 팀 목록 저장
+    setSelectedTeamFilter(""); // 필터 초기화
+    console.log("Teams passed to handleDateClick:", teams);
   };
+
+  // 팀별 필터 버튼 클릭 핸들러
+  const handleTeamFilter = (team) => {
+    console.log(`Selected team filter: ${team}`); // 선택한 팀을 로그로 출력
+    setSelectedTeamFilter(team); // 선택한 팀 저장
+  };
+
+  // 팀별 필터링된 글 목록을 화면에 업데이트
+  useEffect(() => {
+    // 'selectedTeamFilter'가 바뀔 때마다 필터링된 글 목록 갱신
+    const filterPostsByTeam = () => {
+      // selectedTeamFilter 값에 따라 필터링
+      if (selectedTeamFilter === "") {
+        return filteredPosts; // 필터링되지 않으면 전체 목록
+      }
+      return filteredPosts.filter((post) => post.team === selectedTeamFilter);
+    };
+
+    const filtered = filterPostsByTeam();
+    setDisplayedPosts(filtered); // 필터링된 글 목록 갱신
+    console.log("Filtered posts:", filtered);
+  }, [selectedTeamFilter, filteredPosts]); // selectedTeamFilter와 filteredPosts 상태에 따라 다시 실행
 
   return (
     <div className="container">
@@ -70,9 +96,28 @@ function Home({ isLoggedIn, onLogout, posts }) {
                     </Link>
                   </div>
 
+                  {/* 팀 필터 버튼 */}
+                  <div className="team-filter-buttons">
+                    {selectedTeams.map((team, index) => (
+                      <button
+                        key={index}
+                        onClick={() => handleTeamFilter(team)}
+                        className={selectedTeamFilter === team ? "active" : ""}
+                      >
+                        {team}
+                      </button>
+                    ))}
+                    <button
+                      onClick={() => handleTeamFilter("기타")}
+                      className={selectedTeamFilter === "기타" ? "active" : ""}
+                    >
+                      기타
+                    </button>
+                  </div>
+
                   {filteredPosts.length > 0 ? (
                     <div className="post-cards">
-                      {filteredPosts.map((post) => (
+                      {displayedPosts.map((post) => (
                         <div key={post.id} className="post-card">
                           <div className="post-header">
                             <h4>{post.title}</h4>

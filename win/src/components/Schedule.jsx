@@ -33,9 +33,12 @@ function Schedule({ selectedTeam, onDateClick }) {
       ?.filter((event) => event.start === selectedDate)
       ?.map((event) => event.title.split(" vs "));
 
+    console.log("Clicked Date:", selectedDate);
+    console.log("Teams on Clicked Date:", clickedDateTeams);
+
     onDateClick({
       date: selectedDate,
-      teams: clickedDateTeams ? clickedDateTeams.flat() : [],
+      teams: clickedDateTeams?.flat() || [], // flat() 사용하여 중첩된 배열을 평탄화
     });
   };
 
