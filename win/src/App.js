@@ -9,6 +9,7 @@ import { useSelector, useDispatch } from "react-redux";
 import Write from "./components/Write.js";
 import { fetchPosts } from "./redux/postsSlice.js";
 import Home from "./components/Home.js";
+import PostDetail from "./components/PostDetail.js";
 
 function App() {
   const dispatch = useDispatch();
@@ -86,6 +87,7 @@ function App() {
               />
             }
           />
+          <Route path="/post/:id" element={<PostDetail />}></Route>
         </Routes>
       </div>
     </Router>

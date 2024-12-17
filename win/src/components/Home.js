@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { ref, onValue } from "firebase/database"; // Realtime Database 메서드 추가
 import { auth, database } from "../firebase.js"; // Firebase 설정 가져오기
 import { onAuthStateChanged } from "firebase/auth";
@@ -144,6 +144,9 @@ function Home({ isLoggedIn, onLogout, posts }) {
                           </div>
                           <p>{post.content}</p>
                           <p className="post-date">작성일:{post.createdDate}</p>
+                          <Link to={`/post/${post.id}`}>
+                            <button>자세히 보기</button>
+                          </Link>
                         </div>
                       ))}
                     </div>
