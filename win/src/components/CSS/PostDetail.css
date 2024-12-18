@@ -57,3 +57,42 @@
 .modal-content h4 {
   margin-bottom: 20px;
 }
+
+.applicants-container {
+  margin-top: 40px;
+}
+
+h3 {
+  margin-bottom: 20px;
+}
+
+.applicants-grid {
+  display: grid;
+  grid-template-columns: repeat(
+    auto-fill,
+    minmax(250px, 1fr)
+  ); /* 카드가 화면 크기에 맞게 배치 */
+  gap: 20px;
+}
+
+.applicant-card {
+  background-color: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  padding: 15px;
+  transition: transform 0.2s, box-shadow 0.2s; /* 호버 효과 */
+}
+
+.applicant-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
+}
+
+.applicant-card p {
+  margin: 5px 0;
+}
+
+.applicant-card strong {
+  color: #333;
+}

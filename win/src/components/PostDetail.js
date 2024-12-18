@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { ref, get, update } from "firebase/database";
+import { ref, get, update, onValue } from "firebase/database";
 import { database } from "../firebase";
 import { getAuth } from "firebase/auth";
 import "./CSS/PostDetail.css";
@@ -17,42 +17,42 @@ function PostDetail() {
   });
   const [applicationStatus, setApplicationStatus] = useState(""); // 폼 제출 상태
   const auth = getAuth();
+  const [applicants, setApplicants] = useState([]); // 신청자 목록 상태 관리
 
   useEffect(() => {
     // 현재 사용자 정보 가져오기 (닉네임)
     const user = auth.currentUser;
     if (user) {
       const userRef = ref(database, `users/${user.uid}`);
-      get(userRef)
-        .then((snapshot) => {
-          if (snapshot.exists()) {
-            const userData = snapshot.val();
-            setFormData((prevData) => ({
-              ...prevData,
-              nickname: userData.nickname || "", // nickname 사용
-            }));
-          }
-        })
-        .catch((error) => {
-          console.error("Error fetching user data:", error);
-        });
+      onValue(userRef, (snapshot) => {
+        if (snapshot.exists()) {
+          const userData = snapshot.val();
+          setFormData((prevData) => ({
+            ...prevData,
+            nickname: userData.nickname || "", // nickname 사용
+          }));
+        }
+      });
     }
 
     const postRef = ref(database, `posts/${id}`); // posts 밑에 해당 ID 경로
-    get(postRef)
-      .then((snapshot) => {
-        if (snapshot.exists()) {
-          console.log("Post data:", snapshot.val()); // 데이터 가져오기 확인
-          setPost(snapshot.val());
-        } else {
-          console.log("No data found for this ID");
-          setPost(null);
-        }
-      })
-      .catch((error) => {
-        console.error("Error fetching post data:", error);
-      })
-      .finally(() => setLoading(false));
+    const unsubscribe = onValue(postRef, (snapshot) => {
+      if (snapshot.exists()) {
+        const postData = snapshot.val();
+        setPost(postData); // Post 상태 업데이트
+        setApplicants(
+          postData.applicants ? Object.values(postData.applicants) : []
+        ); // 신청자 목록 상태에 저장
+      } else {
+        setPost(null); // 신청자가 없을 경우 빈 배열로 초기화
+      }
+      setLoading(false);
+    });
+
+    //cleanup : 컴포넌트 언마운트 시 구독 해제
+    return () => {
+      unsubscribe();
+    };
   }, [id, auth]);
 
   const handleChange = (e) => {
@@ -66,22 +66,23 @@ function PostDetail() {
       setApplicationStatus("모든 필드를 입력해주세요.");
       return;
     }
-    const postRef = ref(database, `posts/${id}`);
-    const updates = {};
-    const applicantId = `${nickname}_${Date.now()}`;
 
-    // 신청자 정보 추가
-    updates[`/applicants/${applicantId}`] = {
+    const applicantId = `${nickname}_${Date.now()}`;
+    const newApplicant = {
       nickname,
       contact,
       memo,
       status: "pending",
     };
 
-    update(postRef, updates)
+    // firebase에 업데이트하는 부분 수정
+    const postRef = ref(database, `posts/${id}`);
+    update(postRef, {
+      [`applicants/${applicantId}`]: newApplicant,
+    })
       .then(() => {
         setApplicationStatus("신청이 완료되었습니다!");
-        setApplying(false); // 폼 숨기기
+        setApplying(false); // 모달 닫기
       })
       .catch((error) => {
         console.error("Error submitting application:", error);
@@ -144,6 +145,30 @@ function PostDetail() {
               <button type="submit">신청하기</button>
             </form>
             {applicationStatus && <p>{applicationStatus}</p>}
+          </div>
+        </div>
+      )}
+
+      {post.applicants && (
+        <div className="applicants-container">
+          <h3>참여하고 싶어요!</h3>
+          <div className="applicants-grid">
+            {applicants.map((applicant, index) => (
+              <div key={index} className="applicant-card">
+                <p>
+                  <strong>닉네임:</strong> {applicant.nickname}
+                </p>
+                <p>
+                  <strong>연락처:</strong> {applicant.contact}
+                </p>
+                <p>
+                  <strong>메모:</strong> {applicant.memo}
+                </p>
+                <p>
+                  <strong>상태:</strong> {applicant.status}
+                </p>
+              </div>
+            ))}
           </div>
         </div>
       )}
