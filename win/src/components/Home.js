@@ -5,7 +5,9 @@ import { auth, database } from "../firebase.js"; // Firebase 설정 가져오기
 import { onAuthStateChanged } from "firebase/auth";
 import Schedule from "./Schedule.jsx";
 import Logout from "./Logout";
-import Button from "@mui/material/Button";
+import Button from "@mui/joy/Button";
+import ButtonGroup from "@mui/joy/ButtonGroup";
+import Add from "@mui/icons-material/Add";
 import "./CSS/Home.css";
 
 function Home({ isLoggedIn, onLogout, posts }) {
@@ -102,7 +104,13 @@ function Home({ isLoggedIn, onLogout, posts }) {
               {/* 날짜 선택 시 글 목록 및 글쓰기 버튼 표시 */}
               {selectedDate ? (
                 <div className="post-list-container">
-                  <h5>{selectedDate}의 승리요정을 찾고 있어요!</h5>
+                  <h5>
+                    {new Date(selectedDate).toLocaleDateString("ko-KR", {
+                      month: "long",
+                      day: "numeric",
+                    })}
+                    의 승리요정을 찾고 있어요!
+                  </h5>
 
                   {/* 글쓰기 버튼 - 선택된 날짜 전달 */}
                   <div className="write-button-container">
@@ -111,27 +119,46 @@ function Home({ isLoggedIn, onLogout, posts }) {
                         ","
                       )}`}
                     >
-                      <button>글쓰기</button>
+                      <Button
+                        sx={{
+                          bgcolor: "secondary.500",
+                          color: "black",
+                          opacity: 1,
+                        }}
+                        startDecorator={<Add />}
+                      >
+                        글쓰기
+                      </Button>
                     </Link>
                   </div>
 
                   {/* 팀 필터 버튼 */}
                   <div className="team-filter-buttons">
-                    {selectedTeams.map((team, index) => (
-                      <button
-                        key={index}
-                        onClick={() => handleTeamFilter(team)}
-                        className={selectedTeamFilter === team ? "active" : ""}
-                      >
-                        {team}
-                      </button>
-                    ))}
-                    <button
-                      onClick={() => handleTeamFilter("기타")}
-                      className={selectedTeamFilter === "기타" ? "active" : ""}
+                    <ButtonGroup
+                      spacing="0.5rem"
+                      aria-label="spacing button group"
                     >
-                      기타
-                    </button>
+                      {selectedTeams.map((team, index) => (
+                        <Button
+                          key={index}
+                          onClick={() => handleTeamFilter(team)}
+                          className={
+                            selectedTeamFilter === team ? "active" : ""
+                          }
+                        >
+                          {team}
+                        </Button>
+                      ))}
+
+                      <Button
+                        onClick={() => handleTeamFilter("기타")}
+                        className={
+                          selectedTeamFilter === "기타" ? "active" : ""
+                        }
+                      >
+                        기타
+                      </Button>
+                    </ButtonGroup>
                   </div>
 
                   {filteredPosts.length > 0 ? (
@@ -144,8 +171,19 @@ function Home({ isLoggedIn, onLogout, posts }) {
                           </div>
                           <p>{post.content}</p>
                           <p className="post-date">작성일:{post.createdDate}</p>
-                          <Link to={`/post/${post.id}`}>
-                            <button>자세히 보기</button>
+                          <Link
+                            to={`/post/${post.id}`}
+                            style={{ textDecoration: "none" }}
+                          >
+                            <Button
+                              sx={{
+                                bgcolor: "secondary.500",
+                                color: "black",
+                                opacity: 1,
+                              }}
+                            >
+                              자세히 보기
+                            </Button>
                           </Link>
                         </div>
                       ))}

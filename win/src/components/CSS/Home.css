@@ -4,16 +4,10 @@
   align-items: center;
 }
 
-.button-container {
-  display: flex; /* 버튼을 가로로 배치 */
-  gap: 16px; /* 버튼 간의 간격 */
-  justify-content: center; /* 중앙 정렬 (선택 사항) */
-}
-
 /* 글 목록 컨테이너 스타일 */
 .post-list-container {
   width: 70%;
-  margin-top: 20px;
+  margin: 20px 0px 20px 0px;
   padding: 20px;
   border: 2px solid #ddd;
   border-radius: 8px;

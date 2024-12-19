@@ -1,6 +1,7 @@
 import { signOut } from "firebase/auth";
 import React from "react";
 import { auth } from "../firebase";
+import Button from "@mui/joy/Button";
 
 function Logout({ onLogout }) {
   const handleLogout = async () => {
@@ -14,7 +15,17 @@ function Logout({ onLogout }) {
       console.error("로그아웃 중 오류 발생 :", error);
     }
   };
-  return <button onClick={handleLogout}>로그아웃</button>;
+  return (
+    <Button
+      sx={{
+        color: "white",
+        backgroundColor: "black",
+      }}
+      onClick={handleLogout}
+    >
+      로그아웃
+    </Button>
+  );
 }
 
 export default Logout;
