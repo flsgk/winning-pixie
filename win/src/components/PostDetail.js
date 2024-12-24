@@ -96,7 +96,7 @@ function PostDetail() {
   return (
     <div>
       <h1>{post.title}</h1>
-      <p>{post.content}</p>
+      <div dangerouslySetInnerHTML={{ __html: post.content }}></div>
       <p>작성일: {post.createdDate}</p>
       <p>경기 날짜: {post.playDate}</p>
       <p>팀: {post.team}</p>

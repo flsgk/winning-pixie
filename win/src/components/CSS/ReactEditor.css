@@ -1,0 +1,10 @@
+.custom-editor {
+  height: 400px; /* 에디터 전체 높이 */
+  width: 60%; /* 에디터 전체 너비 */
+}
+
+/* 내부 컨테이너 스타일 (글쓰기 영역) */
+.custom-editor .ql-container {
+  height: calc(100% - 42px); /* 툴바 제외한 영역 */
+  overflow-y: auto; /* 스크롤 활성화 */
+}

@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { addPostToFirebase } from "../redux/postsSlice";
 import FormLabel from "@mui/joy/FormLabel";
-import Textarea from "@mui/joy/Textarea";
+import ReactEditor from "./ReactEditor";
 
 function Write() {
   const navigate = useNavigate();
@@ -61,16 +61,7 @@ function Write() {
         <br />
         <div>
           <FormLabel>내용</FormLabel>
-          <Textarea
-            value={content}
-            name="content"
-            placeholder="Placeholder"
-            minRows={20}
-            onChange={(e) => setContent(e.target.value)}
-            sx={{
-              width: "80%", // 원하는 가로 넓이를 설정 (예: 70%)
-            }}
-          />
+          <ReactEditor value={content} onChange={setContent} />
         </div>
         <br />
         <div>
