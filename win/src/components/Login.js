@@ -1,6 +1,11 @@
 import React, { useState } from "react";
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
+import FormLabel from "@mui/joy/FormLabel";
+import Input from "@mui/joy/Input";
+import Button from "@mui/joy/Button";
+import Box from "@mui/joy/Box";
+import Typography from "@mui/joy/Typography";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -21,29 +26,45 @@ const Login = () => {
   };
 
   return (
-    <div>
-      <h2>로그인</h2>
-      <div>
-        <label>이메일 </label>
-        <input
-          type="email"
-          placeholder="이메일 계정을 입력하세요."
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        ></input>
-      </div>
-      <div>
-        <label>비밀번호 </label>
-        <input
-          type="password"
-          placeholder="비밀번호를 입력하세요."
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        ></input>
-      </div>
-      <button onClick={handleLogin}>로그인하기</button>
-      {message && <p>{message}</p>}
-    </div>
+    <>
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          minHeight: "100vh",
+          gap: 2, // 요소 간 간격
+          textAlign: "center",
+        }}
+      >
+        <Typography component="h1" level="h3">
+          로그인
+        </Typography>
+        <Box sx={{ width: "300px" }}>
+          <FormLabel>Email</FormLabel>
+          <Input
+            type="email"
+            placeholder="이메일 계정을 입력하세요."
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            sx={{ width: "100%", mb: 1 }}
+          />
+          <FormLabel>Password</FormLabel>
+          <Input
+            type="password"
+            placeholder="비밀번호를 입력하세요."
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            sx={{ width: "100%", mb: 3 }}
+          />
+          <Button onClick={handleLogin} sx={{ width: "100%" }}>
+            로그인하기
+          </Button>
+        </Box>
+        {message && <p>{message}</p>}
+      </Box>
+    </>
   );
 };
 

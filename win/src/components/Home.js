@@ -204,20 +204,20 @@ function Home({ isLoggedIn, onLogout, posts }) {
         </>
       ) : (
         <>
+          <p>오늘의 승리요정은 누구?</p>
           <p>로그인 또는 회원가입을 진행해주세요.</p>
-          <nav>
-            <div className="button-container">
-              <Link to="/login">
-                <Button variant="contained" className="Button">
-                  Login
-                </Button>
-              </Link>
-              <Link to="/signup">
-                <Button variant="contained" className="Button">
-                  Sign Up
-                </Button>
-              </Link>
-            </div>
+          <nav
+            style={{
+              display: "flex",
+              gap: "1rem", // 버튼 사이 간격 설정
+            }}
+          >
+            <Link to="/login">
+              <Button>로그인</Button>
+            </Link>
+            <Link to="/signup">
+              <Button>회원가입</Button>
+            </Link>
           </nav>
         </>
       )}

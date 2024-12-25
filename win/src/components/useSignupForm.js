@@ -12,6 +12,7 @@ const useSignupForm = (onSuccess) => {
     nickname: "",
     fullname: "",
     password: "",
+    confirmPassword: "",
   });
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
@@ -24,13 +25,19 @@ const useSignupForm = (onSuccess) => {
 
   // 유효성 검사
   const validateForm = () => {
-    const { email, nickname, fullname, password } = formData;
+    const { email, nickname, fullname, password, confirmPassword } = formData;
+
     if (!email || !nickname || !fullname || !password) {
       setMessage("모든 필드를 입력해주세요.");
       return false;
     }
+
     if (password.length < 6) {
       setMessage("비밀번호는 6자 이상이어야 합니다.");
+      return false;
+    }
+    if (password !== confirmPassword) {
+      setMessage("비밀번호가 일치하지 않습니다.");
       return false;
     }
     return true;

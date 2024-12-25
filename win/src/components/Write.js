@@ -49,6 +49,14 @@ function Write() {
   return (
     <div>
       <form>
+        <h5>
+          {new Date(playDate).toLocaleDateString("ko-KR", {
+            month: "long",
+            day: "numeric",
+          })}
+          의 승리요정을 찾는 게시물을 작성해주세요.
+        </h5>
+
         <div>
           <p>제목</p>
           <input

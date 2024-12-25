@@ -1,3 +1,9 @@
+body {
+  background-color: #f0f8ff; /* 옅은 하늘색 */
+  margin: 0; /* 기본 여백 제거 */
+  min-height: 100vh; /* 화면 전체 높이 적용 */
+}
+
 .container {
   display: flex;
   justify-content: center;
