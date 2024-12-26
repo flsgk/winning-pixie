@@ -41,6 +41,7 @@ const Login = () => {
         <Typography component="h1" level="h3">
           로그인
         </Typography>
+        
         <Box sx={{ width: "300px" }}>
           <FormLabel>Email</FormLabel>
           <Input

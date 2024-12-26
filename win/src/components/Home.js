@@ -8,7 +8,7 @@ import Logout from "./Logout";
 import Button from "@mui/joy/Button";
 import ButtonGroup from "@mui/joy/ButtonGroup";
 import Add from "@mui/icons-material/Add";
-import "./CSS/Home.css";
+import Grid from "@mui/joy/Grid";
 
 function Home({ isLoggedIn, onLogout, posts }) {
   const [selectedDate, setSelectedDate] = useState(null); // 선택된 날짜
@@ -89,20 +89,35 @@ function Home({ isLoggedIn, onLogout, posts }) {
   }
 
   return (
-    <div className="container">
-      <h1>승리요정🧚🏻‍♀️</h1>
-      {isLoggedIn ? (
-        <>
-          <p>안녕하세요, {nickname}님</p>
-          {selectedTeam ? (
-            <>
-              <Schedule
-                selectedTeam={selectedTeam}
-                onDateClick={handleDateClick}
-              />
+    <Grid container spacing={2} sx={{ flexGrow: 1, justifyContent: "center" }}>
+      <Grid item xs={8}>
+        <div className="header">
+          <h1>승리요정🧚🏻‍♀️</h1>
+          {isLoggedIn ? (
+            <p>안녕하세요, {nickname}님</p>
+          ) : (
+            <p>오늘의 승리요정은 누구?</p>
+          )}
+        </div>
+      </Grid>
+      <Grid item xs={4}>
+        <Logout />
+      </Grid>
 
-              {/* 날짜 선택 시 글 목록 및 글쓰기 버튼 표시 */}
-              {selectedDate ? (
+      <Grid container spacing={2} sx={{ flexGrow: 1 }}>
+        {isLoggedIn ? (
+          <>
+            <Grid item xs={12} sm={8}>
+              <div className="schedule-container">
+                <Schedule
+                  selectedTeam={selectedTeam}
+                  onDateClick={handleDateClick}
+                />
+              </div>
+            </Grid>
+
+            {selectedDate ? (
+              <Grid item xs={12} sm={4}>
                 <div className="post-list-container">
                   <h5>
                     {new Date(selectedDate).toLocaleDateString("ko-KR", {
@@ -111,8 +126,6 @@ function Home({ isLoggedIn, onLogout, posts }) {
                     })}
                     의 승리요정을 찾고 있어요!
                   </h5>
-
-                  {/* 글쓰기 버튼 - 선택된 날짜 전달 */}
                   <div className="write-button-container">
                     <Link
                       to={`/write?date=${selectedDate}&teams=${selectedTeams.join(
@@ -131,8 +144,7 @@ function Home({ isLoggedIn, onLogout, posts }) {
                       </Button>
                     </Link>
                   </div>
-
-                  {/* 팀 필터 버튼 */}
+                  {/* 글 목록 및 필터 버튼 */}
                   <div className="team-filter-buttons">
                     <ButtonGroup
                       spacing="0.5rem"
@@ -149,7 +161,6 @@ function Home({ isLoggedIn, onLogout, posts }) {
                           {team}
                         </Button>
                       ))}
-
                       <Button
                         onClick={() => handleTeamFilter("기타")}
                         className={
@@ -192,36 +203,26 @@ function Home({ isLoggedIn, onLogout, posts }) {
                     <p>이 날짜에 작성된 글이 없습니다.</p>
                   )}
                 </div>
-              ) : (
-                <p>날짜를 선택하면 관련 글을 볼 수 있습니다.</p>
-              )}
-            </>
-          ) : (
-            <p>팀을 선택해주세요.</p>
-          )}
-
-          <Logout onLogout={onLogout} />
-        </>
-      ) : (
-        <>
-          <p>오늘의 승리요정은 누구?</p>
-          <p>로그인 또는 회원가입을 진행해주세요.</p>
-          <nav
-            style={{
-              display: "flex",
-              gap: "1rem", // 버튼 사이 간격 설정
-            }}
-          >
-            <Link to="/login">
-              <Button>로그인</Button>
-            </Link>
-            <Link to="/signup">
-              <Button>회원가입</Button>
-            </Link>
-          </nav>
-        </>
-      )}
-    </div>
+              </Grid>
+            ) : (
+              <p>날짜를 선택하면 관련 글을 볼 수 있습니다.</p>
+            )}
+          </>
+        ) : (
+          <>
+            <p>로그인 또는 회원가입을 진행해주세요.</p>
+            <nav style={{ display: "flex", gap: "1rem" }}>
+              <Link to="/login">
+                <Button>로그인</Button>
+              </Link>
+              <Link to="/signup">
+                <Button>회원가입</Button>
+              </Link>
+            </nav>
+          </>
+        )}
+      </Grid>
+    </Grid>
   );
 }
 

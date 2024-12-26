@@ -1,96 +1,46 @@
+/* 전체 화면 스타일 */
 body {
-  background-color: #f0f8ff; /* 옅은 하늘색 */
-  margin: 0; /* 기본 여백 제거 */
-  min-height: 100vh; /* 화면 전체 높이 적용 */
+  font-family: "Arial", sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f4f4f9;
+  display: flex;
+  flex-direction: column; /* 헤더를 위에 두고 나머지 콘텐츠를 아래로 배치 */
+  height: 100vh;
 }
 
+/* 헤더 스타일 */
+.header {
+  background-color: #f8f8f8;
+  padding: 1rem;
+  text-align: center;
+  border-bottom: 2px solid #e0e0e0;
+}
+
+/* 메인 콘텐츠 레이아웃 */
 .container {
   display: flex;
-  justify-content: center;
-  align-items: center;
+  justify-content: space-between; /* 달력과 글 목록을 좌우로 배치 */
+  gap: 2rem;
+  padding: 2rem;
+  flex-grow: 1; /* 메인 콘텐츠 영역을 남은 공간에 맞춰 확장 */
+  flex-wrap: wrap; /* 화면 크기가 작아지면 자동으로 줄 바꿈 */
 }
 
-/* 글 목록 컨테이너 스타일 */
-.post-list-container {
-  width: 70%;
-  margin: 20px 0px 20px 0px;
-  padding: 20px;
-  border: 2px solid #ddd;
+/* 달력 스타일 (왼쪽) */
+.schedule-container {
+  flex-basis: 60%; /* 달력은 전체 콘텐츠의 30% 차지 */
+  background-color: #fff;
+  padding: 1.5rem;
   border-radius: 8px;
-  background-color: #f9f9f9;
-  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  border: 1px solid #ccc;
 }
 
-/* 글 목록 헤더 스타일 */
-.post-list-container h5 {
-  margin: 0 0 15px 0;
-  font-size: 1.5rem;
-  color: #333;
-  border-bottom: 1px solid #ddd;
-  padding-bottom: 5px;
-}
-/* 글 카드 컨테이너 스타일 */
-.post-cards {
-  display: grid; /* 그리드 레이아웃 사용 */
-  grid-template-columns: repeat(
-    auto-fit,
-    minmax(250px, 1fr)
-  ); /* 카드 크기 자동 조정 */
-  gap: 15px; /* 카드 간격 */
-}
-
-/* 개별 글 카드 스타일 */
-.post-card {
-  padding: 15px;
-  border: 1px solid #ddd;
+/* 글 목록 스타일 (오른쪽) */
+.post-list-container {
+  flex-basis: 40%; /* 글 목록은 전체 콘텐츠의 65% 차지 */
+  padding: 1.5rem;
+  border: 1px solid #ccc;
   border-radius: 8px;
   background-color: #fff;
-  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
-  transition: transform 0.2s, box-shadow 0.2s;
-}
-
-.post-card:hover {
-  transform: translateY(-5px); /* 살짝 떠오르는 효과 */
-  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.15); /* 강조된 그림자 */
-}
-
-/* 글 카드 제목 스타일 */
-.post-card h6 {
-  margin: 0 0 10px 0;
-  font-size: 1.2rem;
-  color: #555;
-}
-
-/* 글 카드 본문 스타일 */
-.post-card p {
-  margin: 0 0 10px 0;
-  font-size: 1rem;
-  color: #666;
-}
-
-.post-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.post-header h4 {
-  margin: 0;
-  font-size: 1.25em;
-}
-
-.post-header .post-team {
-  margin: 0;
-  font-size: 1em;
-  color: white;
-  background-color: black;
-  border: none;
-  border-radius: 15px;
-  padding: 5px;
-}
-
-.post-date {
-  margin-top: 12px; /* 내용과 날짜 간격 추가 */
-  font-size: 12px;
-  color: rgb(168, 168, 168);
 }

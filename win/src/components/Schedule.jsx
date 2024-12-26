@@ -95,6 +95,8 @@ function Schedule({ selectedTeam, onDateClick }) {
           }}
           datesSet={handleDatesSet}
           dateClick={handleDateClick} // dateClick 핸들러에서 onDateClick 호출
+          height="500px"
+          width="300px"
         />
       </div>
     </div>
