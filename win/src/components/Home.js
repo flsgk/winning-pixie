@@ -9,6 +9,13 @@ import Button from "@mui/joy/Button";
 import ButtonGroup from "@mui/joy/ButtonGroup";
 import Add from "@mui/icons-material/Add";
 import Grid from "@mui/joy/Grid";
+import Card from "@mui/joy/Card";
+import CardContent from "@mui/joy/CardContent";
+import CardActions from "@mui/joy/CardActions";
+import Typography from "@mui/joy/Typography";
+import Box from "@mui/joy/Box";
+import Chip from "@mui/joy/Chip";
+import Divider from "@mui/joy/Divider";
 
 function Home({ isLoggedIn, onLogout, posts }) {
   const [selectedDate, setSelectedDate] = useState(null); // 선택된 날짜
@@ -52,7 +59,7 @@ function Home({ isLoggedIn, onLogout, posts }) {
   }, []);
 
   // 날짜 클릭 핸들러
-  const handleDateClick = ({ date, teams }) => {
+  const handleEventClick = ({ date, teams }) => {
     const filtered = posts.filter((post) => post.playDate === date);
     setFilteredPosts(filtered);
     setSelectedDate(date); // 날짜 저장
@@ -89,7 +96,16 @@ function Home({ isLoggedIn, onLogout, posts }) {
   }
 
   return (
-    <Grid container spacing={2} sx={{ flexGrow: 1, justifyContent: "center" }}>
+    <Grid
+      container
+      spacing={2}
+      sx={{
+        flexGrow: 1,
+        display: "flex",
+        justifyContent: "space-between",
+        paddingX: 5,
+      }}
+    >
       <Grid item xs={8}>
         <div className="header">
           <h1>승리요정🧚🏻‍♀️</h1>
@@ -100,7 +116,15 @@ function Home({ isLoggedIn, onLogout, posts }) {
           )}
         </div>
       </Grid>
-      <Grid item xs={4}>
+      <Grid
+        item
+        xs={4}
+        sx={{
+          display: "flex", // Flexbox 활성화
+          justifyContent: "flex-end", // 내부에서 오른쪽 정렬
+          alignItems: "center", // 세로 정렬
+        }}
+      >
         <Logout />
       </Grid>
 
@@ -111,14 +135,14 @@ function Home({ isLoggedIn, onLogout, posts }) {
               <div className="schedule-container">
                 <Schedule
                   selectedTeam={selectedTeam}
-                  onDateClick={handleDateClick}
+                  onEventClick={handleEventClick}
                 />
               </div>
             </Grid>
 
             {selectedDate ? (
-              <Grid item xs={12} sm={4}>
-                <div className="post-list-container">
+              <Grid item xs={12} sm={4} sx={{ paddingX: 4 }}>
+                <Box>
                   <h5>
                     {new Date(selectedDate).toLocaleDateString("ko-KR", {
                       month: "long",
@@ -132,16 +156,7 @@ function Home({ isLoggedIn, onLogout, posts }) {
                         ","
                       )}`}
                     >
-                      <Button
-                        sx={{
-                          bgcolor: "secondary.500",
-                          color: "black",
-                          opacity: 1,
-                        }}
-                        startDecorator={<Add />}
-                      >
-                        글쓰기
-                      </Button>
+                      <Button startDecorator={<Add />}>글쓰기</Button>
                     </Link>
                   </div>
                   {/* 글 목록 및 필터 버튼 */}
@@ -149,6 +164,10 @@ function Home({ isLoggedIn, onLogout, posts }) {
                     <ButtonGroup
                       spacing="0.5rem"
                       aria-label="spacing button group"
+                      sx={{
+                        marginBottom: 1,
+                        marginTop: 1,
+                      }}
                     >
                       {selectedTeams.map((team, index) => (
                         <Button
@@ -171,38 +190,64 @@ function Home({ isLoggedIn, onLogout, posts }) {
                       </Button>
                     </ButtonGroup>
                   </div>
-
+                  <Divider orientation="horizontal" />
                   {filteredPosts.length > 0 ? (
-                    <div className="post-cards">
+                    <Box
+                      sx={{
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                        maxHeight: 500, // 최대 높이 설정 (필요에 맞게 조정)
+                        overflowY: "auto", // 세로 스크롤 활성화
+                      }}
+                    >
                       {displayedPosts.map((post) => (
-                        <div key={post.id} className="post-card">
-                          <div className="post-header">
-                            <h4>{post.title}</h4>
-                            <p className="post-team">{post.team}</p>
-                          </div>
-                          <p>{post.content}</p>
-                          <p className="post-date">작성일:{post.createdDate}</p>
-                          <Link
-                            to={`/post/${post.id}`}
-                            style={{ textDecoration: "none" }}
-                          >
-                            <Button
+                        <Card
+                          key={post.id}
+                          className="post-card"
+                          variant="outlined"
+                          sx={{
+                            width: 350,
+                            marginBottom: 1,
+                            marginTop: 1,
+                          }}
+                        >
+                          <CardContent>
+                            <Box
+                              className="post-header"
                               sx={{
-                                bgcolor: "secondary.500",
-                                color: "black",
-                                opacity: 1,
+                                display: "flex",
+                                justifyContent: "space-between",
+                                alignItems: "center",
                               }}
                             >
-                              자세히 보기
-                            </Button>
-                          </Link>
-                        </div>
+                              <Typography level="title-lg">
+                                {post.title}
+                              </Typography>
+                              <Chip size="md" variant="soft">
+                                {post.team}
+                              </Chip>
+                            </Box>
+                            <Typography level="body-sm">
+                              {post.content}
+                            </Typography>
+                            <Typography level="body-sm" className="post-date">
+                              작성일:{post.createdDate}
+                            </Typography>
+                            <Link
+                              to={`/post/${post.id}`}
+                              style={{ textDecoration: "none" }}
+                            >
+                              <Button>자세히 보기</Button>
+                            </Link>
+                          </CardContent>
+                        </Card>
                       ))}
-                    </div>
+                    </Box>
                   ) : (
                     <p>이 날짜에 작성된 글이 없습니다.</p>
                   )}
-                </div>
+                </Box>
               </Grid>
             ) : (
               <p>날짜를 선택하면 관련 글을 볼 수 있습니다.</p>

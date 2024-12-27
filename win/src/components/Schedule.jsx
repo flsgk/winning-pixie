@@ -4,6 +4,18 @@ import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import "./CSS/Schedule.css";
 
+const teamColors = {
+  두산: "#032070",
+  롯데: "#D42D48",
+  LG: "#C00C3F",
+  NC: "#012B69",
+  KT: "#000000",
+  SSG: "#CF152D",
+  KIA: "#ED1C24",
+  키움: "#860020",
+  한화: "#F37321",
+};
+
 // API 호출 함수
 const fetchSchedule = async (year, month, team) => {
   const apiUrl = `http://localhost:5001/api/schedule?year=${year}&month=${month}&team=${team}`;
@@ -19,26 +31,22 @@ const fetchSchedule = async (year, month, team) => {
   }
 };
 
-function Schedule({ selectedTeam, onDateClick }) {
+function Schedule({ selectedTeam, onEventClick }) {
   const [events, setEvents] = useState(null);
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [error, setError] = useState(null);
 
-  // 날짜 클릭 핸들러
-  const handleDateClick = (dateInfo) => {
-    const selectedDate = dateInfo.dateStr; // 클릭한 날짜
+  // 이벤트 클릭 핸들러
+  const handleEventClick = (eventInfo) => {
+    const selectedEvent = eventInfo.event; // 클릭한 이벤트
+    const selectedTeams = selectedEvent.title.split(" vs ");
+    console.log("Clicked Event:", selectedEvent);
+    console.log("Teams on Clicked Event:", selectedTeams);
 
-    // 해당 날짜에 대한 team1, team2 데이터를 필터링
-    const clickedDateTeams = events
-      ?.filter((event) => event.start === selectedDate)
-      ?.map((event) => event.title.split(" vs "));
-
-    console.log("Clicked Date:", selectedDate);
-    console.log("Teams on Clicked Date:", clickedDateTeams);
-
-    onDateClick({
-      date: selectedDate,
-      teams: clickedDateTeams?.flat() || [], // flat() 사용하여 중첩된 배열을 평탄화
+    // 이벤트 클릭 시 글 목록을 보여주는 함수 호출
+    onEventClick({
+      teams: selectedTeams, // 팀 이름을 전달
+      date: selectedEvent.startStr, // 클릭한 날짜를 전달
     });
   };
 
@@ -49,13 +57,37 @@ function Schedule({ selectedTeam, onDateClick }) {
       );
       const data = await fetchSchedule(year, month, selectedTeam);
       console.log("Fetched data:", data); // 추가: 데이터 확인
-      const formattedEvents = data.map((game) => ({
-        title: `${game.team1} vs ${game.team2}`,
-        start: `${year}-${String(month).padStart(2, "0")}-${String(
-          game.date
-        ).padStart(2, "0")}`, // YYYY-MM-DD
-      }));
-      console.log("Formatted events:", formattedEvents);
+
+      // 경기 데이터를 필터링하여 선택된 팀의 경기만 표시
+      const filteredGames = data.filter(
+        (game) => game.team1 === selectedTeam || game.team2 === selectedTeam
+      );
+
+      const formattedEvents = filteredGames.map((game) => {
+        let event = {
+          title: `${game.team1} vs ${game.team2}`,
+          start: `${year}-${String(month).padStart(2, "0")}-${String(
+            game.date
+          ).padStart(2, "0")}`, // YYYY-MM-DD
+        };
+
+        // 상대 팀의 색상 적용
+        if (game.team1 === selectedTeam) {
+          // team2의 색상 적용
+          event.backgroundColor = teamColors[game.team2] || "#000";
+          event.borderColor = teamColors[game.team2] || "#000";
+        } else if (game.team2 === selectedTeam) {
+          // team1의 색상 적용
+          event.backgroundColor = teamColors[game.team1] || "#000";
+          event.borderColor = teamColors[game.team1] || "#000";
+        }
+
+        return event;
+      });
+
+      console.log("Formatted events with opponent colors:", formattedEvents);
+
+      // 상태 업데이트
       setEvents(formattedEvents);
     } catch (err) {
       setError("Failed to load schedule");
@@ -89,14 +121,14 @@ function Schedule({ selectedTeam, onDateClick }) {
           events={events}
           locale="ko"
           headerToolbar={{
-            left: "prev,next today",
-            center: "title",
-            right: "dayGridMonth",
+            left: "title",
+            right: "prev,next today",
           }}
           datesSet={handleDatesSet}
-          dateClick={handleDateClick} // dateClick 핸들러에서 onDateClick 호출
-          height="500px"
-          width="300px"
+          eventClick={handleEventClick} // 이벤트 클릭 핸들러 추가
+          height="600px"
+          width="100%" // 달력의 너비를 100%로 설정하여 가득 차게 함
+          contentHeight="auto"
         />
       </div>
     </div>

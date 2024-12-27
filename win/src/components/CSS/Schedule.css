@@ -9,15 +9,11 @@
 }
 
 /* 일정표 툴 바  */
-.fc .fc-toolbar.fc-header-toolbar {
-  margin: 0;
-  padding: 0 40px;
-
-  height: 60px;
-
-  font-size: 12px;
-  line-height: 30px;
-  color: black;
+.fc-header-toolbar {
+  display: flex;
+  justify-content: space-between; /* 왼쪽과 오른쪽으로 요소를 배치 */
+  padding: 0; /* 기본 padding을 제거 */
+  margin: 0; /* 기본 margin을 제거 */
 }
 /* 툴바의 버튼 */
 .fc .fc-toolbar-chunk .fc-button {
