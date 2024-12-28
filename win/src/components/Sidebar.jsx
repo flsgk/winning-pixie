@@ -80,7 +80,7 @@ function Sidebar({ nickname }) {
             <ListItemButton>
               <PersonRoundedIcon />
               <ListItemContent>
-                <Typography level="title-sm">내 정보</Typography>
+                <Typography level="title-sm">내 프로필</Typography>
               </ListItemContent>
             </ListItemButton>
           </ListItem>
