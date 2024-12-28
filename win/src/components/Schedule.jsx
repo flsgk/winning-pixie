@@ -126,7 +126,7 @@ function Schedule({ selectedTeam, onEventClick }) {
           }}
           datesSet={handleDatesSet}
           eventClick={handleEventClick} // 이벤트 클릭 핸들러 추가
-          height="600px"
+          height="500px"
           width="100%" // 달력의 너비를 100%로 설정하여 가득 차게 함
           contentHeight="auto"
         />

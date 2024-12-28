@@ -121,6 +121,7 @@ function PostDetail() {
   return (
     <Box>
       <GoBackButton />
+
       <Card sx={{ width: 500 }}>
         <Box
           sx={{

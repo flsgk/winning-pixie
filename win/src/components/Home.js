@@ -148,6 +148,9 @@ function Home({ isLoggedIn, posts }) {
             }}
           >
             <Logout />
+            <Link to="/my-page">
+              <Button></Button>
+            </Link>
           </Grid>
 
           <Grid container spacing={2} sx={{ flexGrow: 1 }}>
@@ -280,7 +283,7 @@ function Home({ isLoggedIn, posts }) {
                   </Box>
                 </Grid>
               ) : (
-                <p>일정을 클릭하여 글을 확인하세요!</p>
+                <></>
               )}
             </>
           </Grid>
