@@ -1,12 +1,14 @@
 import React from "react";
-import { Typography, Box } from "@mui/joy";
+import { Box } from "@mui/joy";
+
+import Sidebar from "./Sidebar";
 
 function MyPage({ nickname, selectedTeam }) {
   return (
-    <Box sx={{ padding: 4 }}>
-      <Typography level="h2">마이페이지</Typography>
-      <Typography level="body1">닉네임: {nickname}</Typography>
-      <Typography level="body1">선택된 팀: {selectedTeam}</Typography>
+    <Box sx={{ display: "flex", width: "100%" }}>
+      {/* 고정된 사이드바 영역 */}
+      <Sidebar nickname={nickname} /> {/* nickname을 Sidebar로 전달 */}
+      {/* 콘텐츠 영역 */}
     </Box>
   );
 }

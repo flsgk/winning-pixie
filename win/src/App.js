@@ -13,6 +13,7 @@ import { fetchPosts } from "./redux/postsSlice.js";
 import Home from "./components/Home.js";
 import PostDetail from "./components/PostDetail.js";
 import MyPage from "./components/MyPage.jsx";
+import Sidebar from "./components/Sidebar.jsx";
 
 function App() {
   const dispatch = useDispatch();
