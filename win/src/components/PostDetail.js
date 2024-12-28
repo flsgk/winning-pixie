@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { ref, get, update, onValue } from "firebase/database";
 import { database } from "../firebase";
+
 import { getAuth } from "firebase/auth";
 import "./CSS/PostDetail.css";
 import Button from "@mui/joy/Button";
@@ -10,7 +11,6 @@ import Typography from "@mui/joy/Typography";
 import Card from "@mui/joy/Card";
 import Modal from "@mui/joy/Modal";
 import ModalClose from "@mui/joy/ModalClose";
-import Sheet from "@mui/joy/Sheet";
 import {
   Chip,
   DialogContent,
@@ -24,6 +24,7 @@ import {
   Stack,
   Textarea,
 } from "@mui/joy";
+import GoBackButton from "./GoBackButton";
 
 function PostDetail() {
   const { id } = useParams(); // URL에서 ID 가져오기
@@ -119,6 +120,7 @@ function PostDetail() {
 
   return (
     <Box>
+      <GoBackButton />
       <Card sx={{ width: 500 }}>
         <Box
           sx={{

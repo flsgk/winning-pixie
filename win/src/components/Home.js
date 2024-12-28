@@ -220,6 +220,7 @@ function Home({ isLoggedIn, posts }) {
                           alignItems: "center",
                           maxHeight: 500, // 최대 높이 설정 (필요에 맞게 조정)
                           overflowY: "auto", // 세로 스크롤 활성화
+                          paddingX: 1, // 부모 컨테이너 내부 여백 추가
                         }}
                       >
                         {displayedPosts.map((post) => (
@@ -228,9 +229,13 @@ function Home({ isLoggedIn, posts }) {
                             className="post-card"
                             variant="outlined"
                             sx={{
-                              width: 350,
+                              width: "90%", // 기본적으로 90% 너비를 차지
                               marginBottom: 1,
                               marginTop: 1,
+
+                              "@media (max-width: 800px)": {
+                                width: "100%", // 화면 너비가 600px 이하일 때는 100%로 설정
+                              },
                             }}
                           >
                             <CardContent>

@@ -13,6 +13,7 @@ import FavoriteBorder from "@mui/icons-material/FavoriteBorder";
 import Stack from "@mui/joy/Stack";
 import Button from "@mui/joy/Button";
 import Box from "@mui/joy/Box";
+import GoBackButton from "./GoBackButton";
 
 function Write() {
   const navigate = useNavigate();
@@ -60,15 +61,18 @@ function Write() {
       sx={{
         display: "flex",
         flexDirection: "column", // 필요시 세로 방향 정렬
-        justifyContent: "center", // 세로 중앙 정렬
+        justifyContent: "flex-start", // 상단부터 정렬
         alignItems: "center",
         width: 800, // 박스 너비
-
+        height: "100vh", // 뷰포트 전체 높이를 보장
         position: "absolute", // 위치 설정
         top: "50%", // 화면 상단에서 50% 아래로
         transform: "translateY(-50%)", // 정확히 화면 세로 중앙으로 이동
+        boxSizing: "border-box", // padding을 포함한 크기 계산
       }}
     >
+      <GoBackButton />
+
       <Stack spacing={2} sx={{ flexGrow: 1 }}>
         <Stack spacing={1}>
           <FormLabel>글 제목</FormLabel>
