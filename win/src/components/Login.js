@@ -13,6 +13,12 @@ const Login = () => {
   const [message, setMessage] = useState("");
   const navigate = useNavigate();
 
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") {
+      handleLogin();
+    }
+  };
+
   const handleLogin = async () => {
     const auth = getAuth(); // Firebase 인증 객체 가져오기
 
@@ -41,7 +47,7 @@ const Login = () => {
         <Typography component="h1" level="h3">
           로그인
         </Typography>
-        
+
         <Box sx={{ width: "300px" }}>
           <FormLabel>Email</FormLabel>
           <Input
@@ -49,6 +55,7 @@ const Login = () => {
             placeholder="이메일 계정을 입력하세요."
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            onKeyDown={handleKeyDown}
             sx={{ width: "100%", mb: 1 }}
           />
           <FormLabel>Password</FormLabel>
@@ -57,6 +64,7 @@ const Login = () => {
             placeholder="비밀번호를 입력하세요."
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            onKeyDown={handleKeyDown}
             sx={{ width: "100%", mb: 3 }}
           />
           <Button onClick={handleLogin} sx={{ width: "100%" }}>

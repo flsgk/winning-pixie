@@ -4,6 +4,26 @@ import { ref, get, update, onValue } from "firebase/database";
 import { database } from "../firebase";
 import { getAuth } from "firebase/auth";
 import "./CSS/PostDetail.css";
+import Button from "@mui/joy/Button";
+import Box from "@mui/joy/Box";
+import Typography from "@mui/joy/Typography";
+import Card from "@mui/joy/Card";
+import Modal from "@mui/joy/Modal";
+import ModalClose from "@mui/joy/ModalClose";
+import Sheet from "@mui/joy/Sheet";
+import {
+  Chip,
+  DialogContent,
+  DialogTitle,
+  FormControl,
+  FormLabel,
+  Input,
+  ModalDialog,
+  Option,
+  Select,
+  Stack,
+  Textarea,
+} from "@mui/joy";
 
 function PostDetail() {
   const { id } = useParams(); // URL에서 ID 가져오기
@@ -12,8 +32,8 @@ function PostDetail() {
   const [applying, setApplying] = useState(false); // 모달폼 표시 상태
   const [formData, setFormData] = useState({
     nickname: "",
-    contact: "",
     memo: "",
+    team: "choice",
   });
   const [applicationStatus, setApplicationStatus] = useState(""); // 폼 제출 상태
   const auth = getAuth();
@@ -56,22 +76,26 @@ function PostDetail() {
   }, [id, auth]);
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const { nickname, contact, memo } = formData;
-    if (!nickname || !contact || !memo) {
-      setApplicationStatus("모든 필드를 입력해주세요.");
+    const { nickname, memo, team } = formData;
+    if (!nickname || !team || team === "choice") {
+      setApplicationStatus("팀을 선택해주세요.");
       return;
     }
 
     const applicantId = `${nickname}_${Date.now()}`;
     const newApplicant = {
       nickname,
-      contact,
       memo,
+      team,
       status: "pending",
     };
 
@@ -94,85 +118,139 @@ function PostDetail() {
   if (!post) return <p>글을 찾을 수 없습니다.</p>;
 
   return (
-    <div>
-      <h1>{post.title}</h1>
-      <div dangerouslySetInnerHTML={{ __html: post.content }}></div>
-      <p>작성일: {post.createdDate}</p>
-      <p>경기 날짜: {post.playDate}</p>
-      <p>팀: {post.team}</p>
+    <Box>
+      <Card sx={{ width: 500 }}>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
+          <Typography level="h2">{post.title}</Typography>
 
-      {/* 참여하기 버튼 */}
-      {!applying && <button onClick={() => setApplying(true)}>참여하기</button>}
+          <Typography level="body-xs">작성일: {post.createdDate}</Typography>
+        </Box>
+
+        <div dangerouslySetInnerHTML={{ __html: post.content }}></div>
+
+        <Typography level="body-sm">
+          경기일 :
+          {new Date(post.playDate).toLocaleDateString("ko-KR", {
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+          })}
+        </Typography>
+        <Typography level="body-sm">
+          {post.team}의 승리요정을 찾고 있어요!
+        </Typography>
+
+        {/* 참여하기 버튼 */}
+        {!applying && (
+          <Button onClick={() => setApplying(true)}>참여하기</Button>
+        )}
+      </Card>
 
       {/* 모달 */}
       {applying && (
-        <div className="modal">
-          <div className="modal-content">
-            <button className="close" onClick={() => setApplying(false)}>
-              &times;
-            </button>
-            <h4>참여 신청</h4>
+        <Modal
+          open={applying}
+          onClose={() => setApplying(false)}
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <ModalDialog>
+            <ModalClose
+              variant="plain"
+              sx={{ m: 1 }}
+              onClick={() => setApplying(false)}
+            />
+            <DialogTitle>참여 신청</DialogTitle>
+            <DialogContent> 요정님의 정보를 입력해주세요.</DialogContent>
+
             <form onSubmit={handleSubmit}>
-              <div>
-                <label>닉네임</label>
-                <input
-                  type="text"
-                  name="nickname"
-                  value={formData.nickname}
-                  onChange={handleChange}
-                  disabled
-                />
-              </div>
-              <div>
-                <label>연락처</label>
-                <input
-                  type="number"
-                  name="contact"
-                  value={formData.contact}
-                  onChange={handleChange}
-                  placeholder="연락처를 입력하세요"
-                />
-              </div>
-              <div>
-                <label>메모</label>
-                <textarea
-                  name="memo"
-                  value={formData.memo}
-                  onChange={handleChange}
-                  placeholder="메모를 입력하세요"
-                />
-              </div>
-              <button type="submit">신청하기</button>
+              <Stack spacing={2}>
+                <FormControl>
+                  <FormLabel>닉네임</FormLabel>
+                  <Input
+                    type="text"
+                    name="nickname"
+                    value={formData.nickname}
+                    onChange={handleChange}
+                    disabled
+                  />
+                </FormControl>
+
+                <FormControl>
+                  <FormLabel>메모(선택)</FormLabel>
+                  <Textarea
+                    name="memo"
+                    value={formData.memo}
+                    onChange={handleChange}
+                    placeholder="메모를 입력하세요"
+                  />
+                </FormControl>
+                <FormControl>
+                  <FormLabel>응원하는 팀</FormLabel>
+                  <Select
+                    name="team"
+                    value={formData.team}
+                    onChange={(e, newValue) =>
+                      setFormData((prev) => ({ ...prev, team: newValue }))
+                    }
+                  >
+                    <Option value="choice">선택</Option>
+                    <Option value="두산">두산</Option>
+                    <Option value="LG">LG</Option>
+                    <Option value="KIA">KIA</Option>
+                    <Option value="NC">NC</Option>
+                    <Option value="KT">KT</Option>
+                    <Option value="한화">한화</Option>
+                    <Option value="삼성">삼성</Option>
+                    <Option value="키움">키움</Option>
+                    <Option value="SSG">SSG</Option>
+                    <Option value="롯데">롯데</Option>
+                  </Select>
+                </FormControl>
+
+                <Button type="submit">신청하기</Button>
+              </Stack>
             </form>
             {applicationStatus && <p>{applicationStatus}</p>}
-          </div>
-        </div>
+          </ModalDialog>
+        </Modal>
       )}
 
       {post.applicants && (
-        <div className="applicants-container">
-          <h3>참여하고 싶어요!</h3>
-          <div className="applicants-grid">
+        <Box sx={{ marginTop: 2 }}>
+          <Typography level="h3">참여하고 싶어요!</Typography>
+          <Stack spacing={2} sx={{ width: 200 }}>
             {applicants.map((applicant, index) => (
-              <div key={index} className="applicant-card">
-                <p>
-                  <strong>닉네임:</strong> {applicant.nickname}
-                </p>
-                <p>
-                  <strong>연락처:</strong> {applicant.contact}
-                </p>
-                <p>
-                  <strong>메모:</strong> {applicant.memo}
-                </p>
-                <p>
-                  <strong>상태:</strong> {applicant.status}
-                </p>
-              </div>
+              <Card key={index} className="applicant-card">
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                  }}
+                >
+                  <Typography level="body-sm">
+                    {applicant.nickname} 요정님
+                  </Typography>
+                  <Chip color="primary">{applicant.team}</Chip>
+                </Box>
+                <Typography level="body-sm">{applicant.memo}</Typography>
+                <Chip>{applicant.status}</Chip>
+              </Card>
             ))}
-          </div>
-        </div>
+          </Stack>
+        </Box>
       )}
-    </div>
+    </Box>
   );
 }
 
