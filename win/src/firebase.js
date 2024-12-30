@@ -1,7 +1,7 @@
 // src/firebase.js
 import { initializeApp } from "firebase/app";
 import { getDatabase } from "firebase/database"; // Realtime Database 추가
-import { getAuth } from "firebase/auth";
+import { getAuth, GoogleAuthProvider } from "firebase/auth";
 
 const firebaseConfig = {
   apiKey: "AIzaSyApOnSAWpRpxx1k9EkGeFO0a4vZhFOjOpQ",
@@ -19,3 +19,6 @@ const app = initializeApp(firebaseConfig);
 // Export Firebase services
 export const auth = getAuth(app);
 export const database = getDatabase(app);
+
+// Initialize GoogleAuthProvider for Google Sign-In
+export const googleProvider = new GoogleAuthProvider();

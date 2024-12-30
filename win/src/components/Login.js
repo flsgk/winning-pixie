@@ -6,12 +6,20 @@ import Input from "@mui/joy/Input";
 import Button from "@mui/joy/Button";
 import Box from "@mui/joy/Box";
 import Typography from "@mui/joy/Typography";
+import { Divider, Stack } from "@mui/joy";
+import useGoogleLogin from "./useGoogleLogin";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [message, setMessage] = useState("");
   const navigate = useNavigate();
+
+  // useGoogleLogin 훅 사용
+  const { message, loading, handleGoogleLogin } = useGoogleLogin(
+    (redirectPath) => {
+      navigate(redirectPath); // 페이지 이동
+    }
+  );
 
   const handleKeyDown = (e) => {
     if (e.key === "Enter") {
@@ -24,11 +32,8 @@ const Login = () => {
 
     try {
       await signInWithEmailAndPassword(auth, email, password); //signInWithEmailAndPassword 함수로 로그인하기
-      setMessage("로그인 성공!");
       navigate("/");
-    } catch (error) {
-      setMessage(error.message);
-    }
+    } catch (error) {}
   };
 
   return (
@@ -49,6 +54,30 @@ const Login = () => {
         </Typography>
 
         <Box sx={{ width: "300px" }}>
+          <Button
+            variant="soft"
+            color="neutral"
+            fullWidth
+            startDecorator={
+              <img
+                src="https://w7.pngwing.com/pngs/506/509/png-transparent-google-company-text-logo.png"
+                alt="Google Icon"
+                style={{ width: 20, height: 20 }}
+              />
+            }
+            onClick={handleGoogleLogin}
+            sx={{ my: 3 }}
+          >
+            Continue with Google
+          </Button>
+
+          <Divider
+            sx={{
+              my: 1,
+            }}
+          >
+            or
+          </Divider>
           <FormLabel>Email</FormLabel>
           <Input
             type="email"
@@ -58,6 +87,7 @@ const Login = () => {
             onKeyDown={handleKeyDown}
             sx={{ width: "100%", mb: 1 }}
           />
+
           <FormLabel>Password</FormLabel>
           <Input
             type="password"
@@ -67,6 +97,7 @@ const Login = () => {
             onKeyDown={handleKeyDown}
             sx={{ width: "100%", mb: 3 }}
           />
+
           <Button onClick={handleLogin} sx={{ width: "100%" }}>
             로그인하기
           </Button>
