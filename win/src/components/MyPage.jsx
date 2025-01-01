@@ -2,19 +2,19 @@ import React, { useState } from "react";
 import { Box } from "@mui/joy";
 
 import Sidebar from "./Sidebar";
-
-import Record from "./Record";
 import MyProfile from "./MyProfile";
+import WinningRate from "./WinningRate";
 
 function MyPage({ nickname, selectedTeam }) {
   const sidebarWidth = 250; // 사이드바의 고정 너비
-  const [activeTab, setActiveTab] = useState("profile");
+  const [activeTab, setActiveTab] = useState("rate");
 
   const renderContent = () => {
+    console.log("Active Tab:", activeTab); // 디버깅 로그 추가
     // 탭 상태에 따라 렌더링할 콘텐츠를 변경
     switch (activeTab) {
-      case "record":
-        return <Record selectedTeam={selectedTeam} />;
+      case "rate":
+        return <WinningRate selectedTeam={selectedTeam} />;
       case "profile":
         return <MyProfile selectedTeam={selectedTeam} />;
 

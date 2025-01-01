@@ -14,6 +14,7 @@ import Home from "./components/Home.js";
 import PostDetail from "./components/PostDetail.js";
 import MyPage from "./components/MyPage.jsx";
 import Sidebar from "./components/Sidebar.jsx";
+import Record from "./components/Record.jsx";
 
 function App() {
   const dispatch = useDispatch();
@@ -107,6 +108,10 @@ function App() {
           <Route
             path="/my-page"
             element={<MyPage nickname={nickname} selectedTeam={selectedTeam} />}
+          ></Route>
+          <Route
+            path="/record"
+            element={<Record selectedTeam={selectedTeam} />}
           ></Route>
         </Routes>
       </div>

@@ -87,7 +87,7 @@ function Sidebar({ nickname, onTabChange }) {
           </ListItem>
 
           <ListItem>
-            <ListItemButton onClick={() => onTabChange("record")}>
+            <ListItemButton onClick={() => onTabChange("rate")}>
               <EmojiEventsRoundedIcon />
               <ListItemContent>
                 <Typography level="title-sm">내 직관기록</Typography>

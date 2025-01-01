@@ -15,11 +15,13 @@ import {
 } from "@mui/joy";
 import React, { useEffect, useState } from "react";
 import DatePicker from "react-datepicker";
-import { ko } from "date-fns/locale"; // date-fns에서 한국어 로케일 가져오기
+import { el, ko } from "date-fns/locale"; // date-fns에서 한국어 로케일 가져오기
 import "./CSS/DatePicker.css";
 
 import { database } from "../firebase";
 import { ref, set } from "firebase/database";
+import { getAuth } from "firebase/auth";
+import { useLocation } from "react-router-dom";
 
 // api 호출 함수
 const fetchGameData = async (year, month, team) => {
@@ -42,9 +44,26 @@ const Record = ({ selectedTeam }) => {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [gameInfo, setGameInfo] = useState(null);
   const [selectedLocation, setSelectedLocation] = useState("");
-  const [text, setText] = React.useState("");
+  const [text, setText] = useState("");
+  const [userId, setUserId] = useState(null);
+
+  // Firebase에서 로그인 된 사용자 ID 가져오기
+  useEffect(() => {
+    const auth = getAuth();
+    const user = auth.currentUser;
+    if (user) {
+      setUserId(user.uid);
+    } else {
+      console.log("로그인되지 않은 사용자");
+    }
+  }, []);
 
   const saveRecord = async () => {
+    if (!userId) {
+      alert("로그인된 사용자가 아닙니다.");
+      return;
+    }
+
     if (!gameInfo) {
       alert("저장할 경기 정보가 없습니다.");
       return;
@@ -54,16 +73,16 @@ const Record = ({ selectedTeam }) => {
       location: selectedLocation,
       team: selectedTeam,
       opponent: gameInfo.opponent,
-      score1: gameInfo.score1,
-      score2: gameInfo.score2,
-      result: getGameResult(gameInfo.score1, gameInfo.score2),
+      score1: gameInfo.myScore,
+      score2: gameInfo.oppScore,
+      result: getGameResult(gameInfo.myScore, gameInfo.oppScore),
       diary: text,
     };
 
     try {
       const recordRef = ref(
         database,
-        `records/${selectedTeam}/${gameInfo.date}`
+        `users/${userId}/records/${selectedTeam}/${gameInfo.date}`
       );
       await set(recordRef, recordData);
       alert("기록이 저장되었습니다!");
@@ -97,8 +116,12 @@ const Record = ({ selectedTeam }) => {
 
         setGameInfo({
           opponent: isTeam1 ? filteredGame.team2 : filteredGame.team1,
-          score1: isTeam1 ? filteredGame.score1 ?? 0 : filteredGame.score2 ?? 0, // 기본값 0
-          score2: isTeam1 ? filteredGame.score2 ?? 0 : filteredGame.score1 ?? 0, // 기본값 0
+          myScore: isTeam1
+            ? parseInt(filteredGame.score1, 10)
+            : parseInt(filteredGame.score2, 10),
+          oppScore: isTeam1
+            ? parseInt(filteredGame.score2, 10)
+            : parseInt(filteredGame.score1, 10),
 
           date: `${year}-${String(month).padStart(2, "0")}-${String(
             day
@@ -117,9 +140,9 @@ const Record = ({ selectedTeam }) => {
     fetchGameForDate(selectedDate);
   }, [selectedDate]);
 
-  const getGameResult = (score1, score2) => {
-    if (score1 > score2) return "승";
-    if (score1 < score2) return "패";
+  const getGameResult = (myScore, oppScore) => {
+    if (myScore > oppScore) return "승";
+    if (myScore < oppScore) return "패";
     return "무";
   };
 
@@ -177,7 +200,7 @@ const Record = ({ selectedTeam }) => {
                 </Stack>
                 <Stack spacing={1}>
                   <Input
-                    value={getGameResult(gameInfo.score1, gameInfo.score2)}
+                    value={getGameResult(gameInfo.myScore, gameInfo.oppScore)}
                     sx={{
                       width: 50,
                     }}
@@ -200,10 +223,10 @@ const Record = ({ selectedTeam }) => {
                   <Input
                     type="number"
                     sx={{
-                      width: 50,
+                      width: 100,
                     }}
                     placeholder="응원 팀"
-                    value={gameInfo.score1} // 응원 팀 점수
+                    value={gameInfo.myScore} // 응원 팀 점수
                   />
                 </Stack>
               </Stack>
@@ -223,10 +246,10 @@ const Record = ({ selectedTeam }) => {
                   <Input
                     type="number"
                     sx={{
-                      width: 50,
+                      width: 100,
                     }}
                     placeholder="상대 팀"
-                    value={gameInfo.score2} // 상대 팀 점수
+                    value={gameInfo.oppScore} // 상대 팀 점수
                   />
                 </Stack>
               </Stack>
