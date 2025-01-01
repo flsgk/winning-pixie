@@ -112,7 +112,16 @@ function WinningRate({ selectedTeam }) {
         }}
       >
         {records.map((record, index) => (
-          <Card key={index} orientation="horizontal" sx={{ width: 260 }}>
+          <Card
+            key={index}
+            orientation="horizontal"
+            sx={{
+              width: 250,
+              height: 60,
+              display: "flex",
+              alignItems: "center",
+            }}
+          >
             <CardOverflow
               variant="soft"
               color={
@@ -123,7 +132,7 @@ function WinningRate({ selectedTeam }) {
                   : "neutral"
               }
               sx={{
-                px: 0.2,
+                px: 0.4,
                 writingMode: "vertical-rl",
                 justifyContent: "center",
                 fontSize: "s",
