@@ -17,9 +17,10 @@ function Logout({ onLogout }) {
   };
   return (
     <Button
+      color="neutral"
+      variant="soft"
       sx={{
-        color: "white",
-        backgroundColor: "black",
+        borderRadius: 10,
       }}
       onClick={handleLogout}
     >

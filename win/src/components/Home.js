@@ -132,7 +132,9 @@ function Home({ isLoggedIn, posts }) {
           <Grid item xs={8}>
             <div className="header">
               <Typography level="h1">승리요정🧚🏻‍♀️</Typography>
-              <Typography level="title-sm">안녕하세요, {nickname}님</Typography>
+              <Typography level="title-sm">
+                안녕하세요, {nickname} 요정님
+              </Typography>
               <Typography level="title-sm">
                 짜릿한 승리를 함께할 요정을 찾아보세요!
               </Typography>
@@ -147,10 +149,24 @@ function Home({ isLoggedIn, posts }) {
               alignItems: "center", // 세로 정렬
             }}
           >
-            <Logout />
-            <Link to="/my-page">
-              <Button></Button>
-            </Link>
+            <Box
+              sx={{
+                display: "flex", // 요소를 가로로 배치
+                gap: 1, // 요소 간의 간격 (theme.spacing 단위, 기본적으로 8px)
+                alignItems: "center", // 세로 정렬을 중앙으로 맞추기 (선택 사항)
+              }}
+            >
+              <Logout />
+              <Link to="/my-page">
+                <Button
+                  color="neutral"
+                  variant="soft"
+                  sx={{ borderRadius: 10 }}
+                >
+                  MY
+                </Button>
+              </Link>
+            </Box>
           </Grid>
 
           <Grid container spacing={2} sx={{ flexGrow: 1 }}>

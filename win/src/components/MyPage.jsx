@@ -1,11 +1,27 @@
-import React from "react";
+import React, { useState } from "react";
 import { Box } from "@mui/joy";
 
 import Sidebar from "./Sidebar";
+
+import Record from "./Record";
 import MyProfile from "./MyProfile";
 
 function MyPage({ nickname, selectedTeam }) {
   const sidebarWidth = 250; // 사이드바의 고정 너비
+  const [activeTab, setActiveTab] = useState("profile");
+
+  const renderContent = () => {
+    // 탭 상태에 따라 렌더링할 콘텐츠를 변경
+    switch (activeTab) {
+      case "record":
+        return <Record selectedTeam={selectedTeam} />;
+      case "profile":
+        return <MyProfile selectedTeam={selectedTeam} />;
+
+      default:
+        return <MyProfile selectedTeam={selectedTeam} />;
+    }
+  };
 
   return (
     <Box sx={{ display: "flex", height: "100vh" }}>
@@ -16,7 +32,8 @@ function MyPage({ nickname, selectedTeam }) {
         }}
       >
         {/* 고정된 사이드바 영역 */}
-        <Sidebar nickname={nickname} /> {/* nickname을 Sidebar로 전달 */}
+        <Sidebar nickname={nickname} onTabChange={(tab) => setActiveTab(tab)} />
+        {/* nickname을 Sidebar로 전달 */}
       </Box>
       <Box
         sx={{
@@ -28,7 +45,7 @@ function MyPage({ nickname, selectedTeam }) {
         }}
       >
         {/* 콘텐츠 영역 */}
-        <MyProfile />
+        {renderContent()}
       </Box>
     </Box>
   );

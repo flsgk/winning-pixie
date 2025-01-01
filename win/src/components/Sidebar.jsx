@@ -18,7 +18,7 @@ import QuestionAnswerRoundedIcon from "@mui/icons-material/QuestionAnswerRounded
 import PersonRoundedIcon from "@mui/icons-material/PersonRounded";
 import Divider from "@mui/joy/Divider";
 
-function Sidebar({ nickname }) {
+function Sidebar({ nickname, onTabChange }) {
   return (
     <Sheet
       sx={{
@@ -66,7 +66,8 @@ function Sidebar({ nickname }) {
             marginTop: 2,
           }}
         />
-        <List>
+
+        <List sx={{ width: "100%", paddingLeft: 2 }}>
           <ListItem>
             <ListItemButton component={Link} to="/">
               <HomeRoundedIcon />
@@ -77,7 +78,7 @@ function Sidebar({ nickname }) {
           </ListItem>
 
           <ListItem>
-            <ListItemButton>
+            <ListItemButton onClick={() => onTabChange("profile")}>
               <PersonRoundedIcon />
               <ListItemContent>
                 <Typography level="title-sm">내 프로필</Typography>
@@ -86,12 +87,10 @@ function Sidebar({ nickname }) {
           </ListItem>
 
           <ListItem>
-            <ListItemButton>
+            <ListItemButton onClick={() => onTabChange("record")}>
               <EmojiEventsRoundedIcon />
               <ListItemContent>
-                <Typography level="title-sm">
-                  나의 직관 승률 확인하기
-                </Typography>
+                <Typography level="title-sm">내 직관기록</Typography>
               </ListItemContent>
             </ListItemButton>
           </ListItem>
