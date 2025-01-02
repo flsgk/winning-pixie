@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { addPostToFirebase } from "../redux/postsSlice";
-import FormControl from "@mui/joy/FormControl";
 import FormLabel from "@mui/joy/FormLabel";
 import FormHelperText from "@mui/joy/FormHelperText";
 import Input from "@mui/joy/Input";
@@ -31,16 +30,13 @@ function Write() {
   const [content, setContent] = useState("");
   const [playDate, setPlayDate] = useState(initialDate); // 날짜 기본 값 설정
   const [teams, setTeams] = useState([...initialTeams, "기타"]); // '기타' 추가
-  const [selectedTeam, setSelectedTeam] = useState("choice"); // '선택'으로 초기화
+  const [yourTeam, setYourTeam] = useState(""); // '선택'으로 초기화
+  const [myTeam, setMyTeam] = useState("");
 
   console.log(teams); // teams 배열을 확인하여 정상적으로 팀들이 전달되는지 확인
 
   const handleSave = (e) => {
     e.preventDefault();
-    if (selectedTeam === "choice") {
-      alert("응원 구단을 선택하세요.");
-      return;
-    }
 
     // 현재 날짜를 ISO 형식으로 저장 (작성일)
     const createdDate = new Date().toLocaleDateString("ko-KR");
@@ -49,9 +45,12 @@ function Write() {
       title,
       content,
       playDate,
-      team: selectedTeam,
+      myTeam: myTeam,
       createdDate,
+      yourTeam: yourTeam,
     };
+
+    console.log("newPost:", newPost); // 값이 제대로 설정되는지 확인
     dispatch(addPostToFirebase(newPost)); // Redux store에 글 추가
     navigate("/");
   };
@@ -111,13 +110,32 @@ function Write() {
         </Stack>
 
         <Stack spacing={1}>
-          <FormLabel>어떤 팀의 요정과 함께 하고 싶나요?</FormLabel>
+          <FormLabel>어떤 팀을 웅원하나요?</FormLabel>
           <Select
-            name="selectedTeam"
-            value={selectedTeam} // 초기값 설정
-            onChange={(event, value) => setSelectedTeam(value)}
+            name="myTeam"
+            value={myTeam} // 초기값 설정
+            onChange={(event, value) => setMyTeam(value)}
             startDecorator={<FavoriteBorder />}
             sx={{ width: 300 }}
+            placeholder="선택"
+          >
+            <Option value={initialTeams[0]}>{initialTeams[0]}</Option>
+            {/* 첫 번째 팀 */}
+            <Option value={initialTeams[1]}>{initialTeams[1]}</Option>
+            {/* 두 번째 팀 */}
+            <Option value="기타">기타</Option> {/* 기타 옵션 */}
+          </Select>
+        </Stack>
+
+        <Stack spacing={1}>
+          <FormLabel>어떤 팀의 요정과 함께 하고 싶나요?</FormLabel>
+          <Select
+            name="yourTeam"
+            value={yourTeam} // 초기값 설정
+            onChange={(event, value) => setYourTeam(value)}
+            startDecorator={<FavoriteBorder />}
+            sx={{ width: 300 }}
+            placeholder="선택"
           >
             <Option value={initialTeams[0]}>{initialTeams[0]}</Option>
             {/* 첫 번째 팀 */}

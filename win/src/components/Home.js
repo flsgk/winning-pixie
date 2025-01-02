@@ -78,15 +78,20 @@ function Home({ isLoggedIn, posts }) {
   useEffect(() => {
     const filterPostsByTeam = () => {
       if (selectedTeamFilter === "") {
-        return filteredPosts; // 필터링되지 않으면 전체 목록
+        return filteredPosts.filter(
+          (post) =>
+            selectedTeams.includes(post.yourTeam) || post.yourTeam === "기타"
+        );
       }
-      return filteredPosts.filter((post) => post.team === selectedTeamFilter);
+      return filteredPosts.filter(
+        (post) => post.yourTeam === selectedTeamFilter
+      ); // 기존 post.team → post.yourTeam으로 수정
     };
 
     const filtered = filterPostsByTeam();
     setDisplayedPosts(filtered); // 필터링된 글 목록 갱신
     console.log("Filtered posts:", filtered);
-  }, [selectedTeamFilter, filteredPosts]); // selectedTeamFilter와 filteredPosts 상태에 따라 다시 실행
+  }, [selectedTeamFilter, filteredPosts, selectedTeams]); // selectedTeamFilter와 filteredPosts 상태에 따라 다시 실행
 
   // 로딩 상태 처리
   if (loading) {
@@ -172,12 +177,12 @@ function Home({ isLoggedIn, posts }) {
           <Grid container spacing={2} sx={{ flexGrow: 1 }}>
             <>
               <Grid item xs={12} sm={8}>
-                <div className="schedule-container">
+                <Box sx={{ marginTop: 5 }}>
                   <Schedule
                     selectedTeam={selectedTeam}
                     onEventClick={handleEventClick}
                   />
-                </div>
+                </Box>
               </Grid>
 
               {selectedDate ? (
@@ -270,7 +275,7 @@ function Home({ isLoggedIn, posts }) {
                                   {post.title}
                                 </Typography>
                                 <Chip size="md" variant="soft">
-                                  {post.team}
+                                  {post.yourTeam}
                                 </Chip>
                               </Box>
 

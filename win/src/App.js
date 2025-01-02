@@ -13,7 +13,7 @@ import { fetchPosts } from "./redux/postsSlice.js";
 import Home from "./components/Home.js";
 import PostDetail from "./components/PostDetail.js";
 import MyPage from "./components/MyPage.jsx";
-import Sidebar from "./components/Sidebar.jsx";
+
 import Record from "./components/Record.jsx";
 
 function App() {
@@ -88,6 +88,7 @@ function App() {
           />
 
           <Route path="/write" element={<Write />} />
+
           <Route
             path="/signup"
             element={<Signup onSignupSuccess={() => setIsLoggedIn(true)} />}

@@ -3,6 +3,7 @@ import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import "./CSS/Schedule.css";
+import { Box } from "@mui/joy";
 
 const teamColors = {
   두산: "#032070",
@@ -113,9 +114,8 @@ function Schedule({ selectedTeam, onEventClick }) {
 
   return (
     <div>
-      <h2>{selectedTeam} 경기 일정</h2>
       {error && <p style={{ color: "red" }}>{error}</p>}
-      <div className="calendar-container">
+      <Box>
         <FullCalendar
           plugins={[dayGridPlugin, interactionPlugin]}
           initialView="dayGridMonth"
@@ -127,11 +127,10 @@ function Schedule({ selectedTeam, onEventClick }) {
           }}
           datesSet={handleDatesSet}
           eventClick={handleEventClick} // 이벤트 클릭 핸들러 추가
-          height="500px"
           width="100%" // 달력의 너비를 100%로 설정하여 가득 차게 함
-          contentHeight="auto"
+          contentHeight="400px" // 달력 높이를 고정하여 6줄 이상 나오지 않도록 설정
         />
-      </div>
+      </Box>
     </div>
   );
 }

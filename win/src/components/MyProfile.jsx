@@ -192,8 +192,8 @@ function MyProfile() {
                   onChange={(e, value) =>
                     setProfileData((prev) => ({ ...prev, selectedTeam: value }))
                   }
+                  placeholder="선택"
                 >
-                  <Option value="choice">선택</Option>
                   <Option value="두산">두산</Option>
                   <Option value="LG">LG</Option>
                   <Option value="KIA">KIA</Option>

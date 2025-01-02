@@ -13,7 +13,6 @@ const ReactEditor = ({ value, onChange }) => {
       [{ color: [] }, { background: [] }],
       [{ list: "ordered" }, { list: "bullet" }],
       [{ align: [] }],
-      ["link", "image"],
     ],
   };
 

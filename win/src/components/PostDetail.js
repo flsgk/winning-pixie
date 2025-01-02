@@ -146,12 +146,17 @@ function PostDetail() {
           })}
         </Typography>
         <Typography level="body-sm">
-          {post.team}의 승리요정을 찾고 있어요!
+          {post.yourTeam}의 승리요정을 찾고 있어요!
         </Typography>
 
         {/* 참여하기 버튼 */}
-        {!applying && (
+        {!applying && !applicationStatus && (
           <Button onClick={() => setApplying(true)}>참여하기</Button>
+        )}
+
+        {/* 신청이 완료되면 버튼 텍스트 변경 */}
+        {applicationStatus === "신청이 완료되었습니다!" && (
+          <Button disabled>참여 완료</Button>
         )}
       </Card>
 
@@ -205,8 +210,8 @@ function PostDetail() {
                     onChange={(e, newValue) =>
                       setFormData((prev) => ({ ...prev, team: newValue }))
                     }
+                    placeholder="선택"
                   >
-                    <Option value="choice">선택</Option>
                     <Option value="두산">두산</Option>
                     <Option value="LG">LG</Option>
                     <Option value="KIA">KIA</Option>

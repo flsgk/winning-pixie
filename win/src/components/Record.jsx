@@ -179,6 +179,7 @@ const Record = ({ selectedTeam }) => {
                     onChange={(event, newValue) =>
                       setSelectedLocation(newValue)
                     }
+                    placeholder="장소 선택"
                   >
                     <Option value="서울 잠실(두산)">서울 잠실(두산)</Option>
                     <Option value="서울 잠실(LG)">서울 잠실(LG)</Option>
