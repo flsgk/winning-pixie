@@ -25,6 +25,7 @@ import {
   Textarea,
 } from "@mui/joy";
 import GoBackButton from "./GoBackButton";
+import Chat from "./Chat";
 
 function PostDetail() {
   const { id } = useParams(); // URL에서 ID 가져오기
@@ -258,6 +259,7 @@ function PostDetail() {
           </Stack>
         </Box>
       )}
+      <Chat />
     </Box>
   );
 }
