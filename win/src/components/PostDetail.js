@@ -119,6 +119,9 @@ function PostDetail() {
   if (loading) return <p>로딩 중...</p>;
   if (!post) return <p>글을 찾을 수 없습니다.</p>;
 
+  // 글 작성자 UID와 현재 로그인된 UID 비교
+  const isAuthor = post && post.uid === auth.currentUser?.uid;
+
   return (
     <Box>
       <GoBackButton />
@@ -150,9 +153,15 @@ function PostDetail() {
           {post.yourTeam}의 승리요정을 찾고 있어요!
         </Typography>
 
-        {/* 참여하기 버튼 */}
-        {!applying && !applicationStatus && (
-          <Button onClick={() => setApplying(true)}>참여하기</Button>
+        {/* 글 작성자는 편집하기 버튼 */}
+        {isAuthor ? (
+          <Button>편집하기</Button>
+        ) : (
+          // 참여하기 버튼은 작성자가 아닐 경우만
+          !applying &&
+          !applicationStatus && (
+            <Button onClick={() => setApplying(true)}>참여하기</Button>
+          )
         )}
 
         {/* 신청이 완료되면 버튼 텍스트 변경 */}

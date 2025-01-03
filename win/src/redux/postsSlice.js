@@ -2,6 +2,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit"; // createAsyncThunk : 비동기 작업 처리를 도와주는 함수
 import { database } from "../firebase";
 import { ref, set, get } from "firebase/database";
+import { getAuth } from "firebase/auth";
 
 // firebase에서 글 가져오기 (onValue 사용 시 데이터가 배열에 반복적으로 추가할 위험이 있어 get 사용하도록 수정)
 export const fetchPosts = createAsyncThunk("posts/fetchPosts", async () => {
@@ -26,11 +27,22 @@ export const fetchPosts = createAsyncThunk("posts/fetchPosts", async () => {
 // firebase에서 글 추가하기
 export const addPostToFirebase = createAsyncThunk(
   "posts/addPost",
+
   async (post) => {
-    const newPostKey = Date.now().toString(); // 고유한 키 생성
-    const postRef = ref(database, "posts/" + newPostKey); // posts/ 경로에 새 글 추가
-    await set(postRef, post);
-    return { id: newPostKey, ...post };
+    const auth = getAuth();
+    const user = auth.currentUser;
+
+    if (user) {
+      const userId = user.uid;
+      const newPostKey = Date.now().toString(); // 고유한 키 생성
+      const postRef = ref(database, "posts/" + newPostKey); // posts/ 경로에 새 글 추가
+
+      const postWithUid = { ...post, uid: userId };
+      await set(postRef, postWithUid);
+
+      return { id: newPostKey, ...postWithUid }; // UID가 추가된 post 반환
+    }
+    throw new Error("사용자 정보가 없습니다.");
   }
 );
 
