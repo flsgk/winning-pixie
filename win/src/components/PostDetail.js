@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { ref, get, update, onValue } from "firebase/database";
+import { ref, get, update, onValue, set } from "firebase/database";
 import { database } from "../firebase";
 
 import { getAuth } from "firebase/auth";
@@ -26,6 +26,7 @@ import {
 } from "@mui/joy";
 import GoBackButton from "./GoBackButton";
 import Chat from "./Chat";
+import { useNavigate } from "react-router-dom";
 
 function PostDetail() {
   const { id } = useParams(); // URL에서 ID 가져오기
@@ -38,8 +39,13 @@ function PostDetail() {
     team: "choice",
   });
   const [applicationStatus, setApplicationStatus] = useState(""); // 폼 제출 상태
-  const auth = getAuth();
   const [applicants, setApplicants] = useState([]); // 신청자 목록 상태 관리
+  const [roomId, setRoomId] = useState(null); // 채팅방 ID
+  const [isApplicant, setIsApplicant] = useState(false);
+  const [currentUser, setCurrentUser] = useState(null);
+
+  const navigate = useNavigate();
+  const auth = getAuth();
 
   useEffect(() => {
     // 현재 사용자 정보 가져오기 (닉네임)
@@ -121,6 +127,53 @@ function PostDetail() {
 
   // 글 작성자 UID와 현재 로그인된 UID 비교
   const isAuthor = post && post.uid === auth.currentUser?.uid;
+
+  // 채팅 방 생성 (클릭 시 chatRooms 경로에 새로운 채팅 방을 추가)
+  const handleChat = async (applicant, index) => {
+    try {
+      const authorUid = auth.currentUser?.uid;
+      const applicantUid = applicant.nickname;
+      const postRef = ref(database, `posts/${id}`);
+
+      // 0. 이미 채팅방이 있는지 확인
+      const applicantRoomId = applicant.roomId;
+
+      if (applicantRoomId) {
+        navigate(`chat/${applicantRoomId}`);
+      } else {
+        if (isAuthor) {
+          // 1. 새로운 채팅 방 생성
+          const newRoomKey = Date.now().toString(); // 고유한 채팅 방의 키를 생성
+          const chatRoomRef = ref(database, `chatRooms/${newRoomKey}`);
+
+          const newChatRoom = {
+            roomId: newRoomKey,
+            authorUid,
+            applicantUid,
+            postId: id,
+            messages: [],
+            createdAt: new Date().toISOString(),
+          };
+          await set(chatRoomRef, newChatRoom); // firebase에 채팅 방 추가
+
+          // 3. 신청자 데이터 업데이트
+          const updatedApplicant = {
+            ...applicant,
+            roomId: newRoomKey, // 신청자 데이터에 roomId를 추가해서 업데이트 하는 것
+          };
+          await update(postRef, {
+            [`applicants/${Object.keys(post.applicants)[index]}`]:
+              updatedApplicant,
+          });
+
+          // 4. 채팅 방으로 이동
+          navigate(`/chat/${newRoomKey}`);
+        }
+      }
+    } catch (error) {
+      console.error("Error creating chat room:", error);
+    }
+  };
 
   return (
     <Box>
@@ -263,12 +316,27 @@ function PostDetail() {
                 </Box>
                 <Typography level="body-sm">{applicant.memo}</Typography>
                 <Chip>{applicant.status}</Chip>
+                {/* 버튼 추가 */}
+
+                {isAuthor ? (
+                  <Button
+                    onClick={() => handleChat(applicant, index)} // 핸들러 연결
+                  >
+                    {applicant.roomId ? "채팅 이동하기" : "채팅하기"}
+                  </Button>
+                ) : (
+                  applicant.nickname === formData.nickname &&
+                  applicant.roomId && ( // 채팅방이 있는 경우에만 참여자가 채팅방 입장 버튼을 볼 수 있도록 하기
+                    <Button onClick={() => handleChat(applicant, index)}>
+                      채팅 이동하기
+                    </Button>
+                  )
+                )}
               </Card>
             ))}
           </Stack>
         </Box>
       )}
-      <Chat />
     </Box>
   );
 }
