@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { ref, onValue } from "firebase/database";
+import { ref, onValue, serverTimestamp, push, off } from "firebase/database";
 import { auth, database } from "../firebase";
 import { io } from "socket.io-client";
 import {
@@ -14,6 +14,7 @@ import {
 } from "@mui/joy";
 import SendRoundedIcon from "@mui/icons-material/SendRounded";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { da } from "date-fns/locale";
 
 const socket = io("http://localhost:4000"); // 여기에서 4000번 포트를 확인
 
@@ -57,19 +58,42 @@ const ChatRoom = () => {
   }, [roomId]);
 
   // 메시지 전송
-
   const sendMessage = () => {
     if (input) {
-      const messageData = {
-        roomId,
-        text: input,
-        sender: currentUserId,
-      };
+      const user = auth.currentUser;
 
-      socket.emit("chat message", messageData); // 서버로 입력한 값을 전송
-      setInput("");
+      if (user) {
+        const messageData = {
+          roomId,
+          text: input,
+          sender: currentUserId,
+          timestamp: serverTimestamp(), // 서버 시간 저장
+        };
+
+        // Firebase 데이터베이스에 저장
+        const messageRef = ref(database, `chatRooms/${roomId}/messages`);
+        push(messageRef, messageData);
+
+        socket.emit("chat message", messageData); // 서버로 입력한 값을 전송
+        setInput("");
+      }
     }
   };
+
+  // 채팅방에서 메시지 가져오기
+  useEffect(() => {
+    const messageRef = ref(database, `chatRooms/${roomId}/messages`);
+    onValue(messageRef, (snapshot) => {
+      const messagesData = snapshot.val();
+      if (messagesData) {
+        setMessages(Object.values(messagesData));
+      }
+    });
+    return () => {
+      off(messageRef);
+    };
+  }, [roomId]);
+
   const handleKeyDown = (e) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
