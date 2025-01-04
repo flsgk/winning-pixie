@@ -13,8 +13,8 @@ import { fetchPosts } from "./redux/postsSlice.js";
 import Home from "./components/Home.js";
 import PostDetail from "./components/PostDetail.js";
 import MyPage from "./components/MyPage.jsx";
-
 import Record from "./components/Record.jsx";
+import ChatRoom from "./components/ChatRoom.jsx";
 
 function App() {
   const dispatch = useDispatch();
@@ -105,7 +105,6 @@ function App() {
               />
             }
           />
-          <Route path="/post/:id" element={<PostDetail />}></Route>
           <Route
             path="/my-page"
             element={<MyPage nickname={nickname} selectedTeam={selectedTeam} />}
@@ -114,6 +113,8 @@ function App() {
             path="/record"
             element={<Record selectedTeam={selectedTeam} />}
           ></Route>
+          <Route path="/post/:id" element={<PostDetail />}></Route>
+          <Route path="/post/:id/chat/:roomId" element={<ChatRoom />} />
         </Routes>
       </div>
     </Router>

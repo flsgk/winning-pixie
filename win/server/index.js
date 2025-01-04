@@ -20,9 +20,23 @@ const io = new Server(server, {
 io.on("connection", (socket) => {
   // 클라이언트가 Socket.IO 서버에 연결될 때 실행되는 이벤트
   console.log("A user connected");
+
+  // 채팅에 참여하는 이벤트
+  socket.on("join room", (roomId) => {
+    socket.join(roomId);
+    console.log(`User joined room: ${roomId}`);
+  });
+
+  // 메시지를 채팅방에 보내는 이벤트
   socket.on("chat message", (msg) => {
-    // 클라이언트가 chat message 이벤트로 데이터를 보냈을 때 실행
-    io.emit("chat message", msg); // 받은 메시지를 모든 연결된 클라이언트에게 전송
+    // roomId에 해당하는 방으로 메시지 발송
+    io.to(msg.roomId).emit("chat message", msg);
+  });
+
+  // 채팅방을 떠나는 이벤트
+  socket.on("leave room", (roomId) => {
+    socket.leave(roomId);
+    console.log(`User left room: ${roomId}`);
   });
 
   socket.on("disconnect", () => {

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { ref, get, update, onValue, set } from "firebase/database";
 import { database } from "../firebase";
-
+import { Link } from "react-router-dom";
 import { getAuth } from "firebase/auth";
 import "./CSS/PostDetail.css";
 import Button from "@mui/joy/Button";
@@ -25,7 +25,6 @@ import {
   Textarea,
 } from "@mui/joy";
 import GoBackButton from "./GoBackButton";
-import Chat from "./Chat";
 import { useNavigate } from "react-router-dom";
 
 function PostDetail() {
@@ -139,7 +138,7 @@ function PostDetail() {
       const applicantRoomId = applicant.roomId;
 
       if (applicantRoomId) {
-        navigate(`chat/${applicantRoomId}`);
+        navigate(`/post/${id}/chat/${applicantRoomId}`); // 기존 채팅방으로 이동
       } else {
         if (isAuthor) {
           // 1. 새로운 채팅 방 생성
@@ -157,6 +156,7 @@ function PostDetail() {
           await set(chatRoomRef, newChatRoom); // firebase에 채팅 방 추가
 
           // 3. 신청자 데이터 업데이트
+          const postRef = ref(database, `posts/${id}`);
           const updatedApplicant = {
             ...applicant,
             roomId: newRoomKey, // 신청자 데이터에 roomId를 추가해서 업데이트 하는 것
@@ -167,7 +167,7 @@ function PostDetail() {
           });
 
           // 4. 채팅 방으로 이동
-          navigate(`/chat/${newRoomKey}`);
+          navigate(`/post/${id}/chat/${newRoomKey}`); // 채팅방으로 이동
         }
       }
     } catch (error) {
