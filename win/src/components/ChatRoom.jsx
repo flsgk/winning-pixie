@@ -1,6 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { ref, onValue, serverTimestamp, push, off } from "firebase/database";
+import {
+  ref,
+  onValue,
+  serverTimestamp,
+  push,
+  off,
+  update,
+} from "firebase/database";
 import { auth, database } from "../firebase";
 import { io } from "socket.io-client";
 import {
@@ -12,21 +19,24 @@ import {
   Stack,
   Typography,
   Divider,
+  Chip,
 } from "@mui/joy";
 import SendRoundedIcon from "@mui/icons-material/SendRounded";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
-import { da } from "date-fns/locale";
+
 import GoBackButton from "./GoBackButton";
 
 const socket = io("http://localhost:4000"); // 여기에서 4000번 포트를 확인
 
 const ChatRoom = () => {
   const { roomId } = useParams();
+  const { id } = useParams(); // URL에서 ID 가져오기
 
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const [currentUserId, setCurrentUserId] = useState(null);
   const [chatRoomInfo, setChatRoomInfo] = useState(null);
+  const [gameInfo, setGameInfo] = useState(null);
 
   // 유저 정보 가져오기
   useEffect(() => {
@@ -54,6 +64,9 @@ const ChatRoom = () => {
     });
 
     // 체팅방 정보 가져오기
+
+    // chatRoomInfo가 올바르게 로드되었는지 확인
+    console.log(chatRoomInfo); // chatRoomInfo가 제대로 로드되었는지 확인
     const chatRoomRef = ref(database, `chatRooms/${roomId}`);
     onValue(chatRoomRef, (snapshot) => {
       if (snapshot.exists()) {
@@ -63,11 +76,21 @@ const ChatRoom = () => {
       }
     });
 
+    const gameInfoRef = ref(database, `posts/${id}`);
+    onValue(gameInfoRef, (snapshot) => {
+      if (snapshot.exists()) {
+        setGameInfo(snapshot.val());
+      } else {
+        console.error("게임 정보를 찾을 수 없습니다.");
+      }
+    });
+
     // 컴포넌트 언마운트 시 clean up
     return () => {
       socket.emit("leave room", roomId); // 채팅방을 떠날 때
       socket.off("chat message"); // 메시지 수신 이벤트 해제
       off(chatRoomRef);
+      off(gameInfoRef);
     };
   }, [roomId]);
 
@@ -138,10 +161,69 @@ const ChatRoom = () => {
     });
   };
 
+  // 유저 선택 상태 변경하기
+
+  const handleUpdateParticipants = () => {
+    // posts 경로에서 해당 포스트 데이터 가져오기
+    const postRef = ref(database, `posts/${id}`);
+    onValue(postRef, (snapshot) => {
+      if (snapshot.exists()) {
+        const postData = snapshot.val();
+        const applicants = postData.applicants;
+
+        const updates = {};
+        for (let applicantId in applicants) {
+          if (applicants[applicantId].nickname === chatRoomInfo.applicantUid) {
+            updates[`posts/${id}/applicants/${applicantId}/status`] =
+              "accepted"; // 선택된 참가자의 상태는 accepted로 설정
+          } else {
+            updates[`posts/${id}/applicants/${applicantId}/status`] = "종료"; // 나머지 참가자들의 상태는 종료로 설정
+          }
+        }
+
+        // Firebase에서 상태 업데이트
+        update(ref(database), updates)
+          .then(() => {
+            console.log("참가자 상태 업데이트 완료");
+          })
+          .catch((error) => {
+            console.error("상태 업데이트 실패:", error);
+          });
+      } else {
+        console.error("포스트를 찾을 수 없습니다.");
+      }
+    });
+  };
+
   return (
     <Box sx={{ maxWidth: "60%", minWidth: "auto" }}>
       <GoBackButton />
-      <Typography>{roomId}</Typography>
+      {gameInfo ? (
+        <>
+          <Typography level="h2">{gameInfo.title}</Typography>
+          <Box sx={{ display: "flex", flexDirection: "row", mt: 1 }}>
+            <Chip>경기일</Chip>
+            <Typography>
+              {new Date(gameInfo.playDate).toLocaleDateString("ko-KR", {
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+              })}
+            </Typography>
+          </Box>
+
+          <Box sx={{ display: "flex", flexDirection: "row" }}>
+            <Chip>채팅방 ID</Chip>
+            <Typography>{roomId}</Typography>
+          </Box>
+          {currentUserId === chatRoomInfo.authorUid && (
+            <Button onClick={handleUpdateParticipants}>같이 갈래요!</Button>
+          )}
+        </>
+      ) : (
+        <Typography>게임 정보를 불러오는 중...</Typography>
+      )}
+
       <Divider />
 
       {messages.map((messageData, index) => (
@@ -161,7 +243,7 @@ const ChatRoom = () => {
             }}
             key={index}
           >
-            <Typography level="body-xs">
+            <Typography>
               {messageData.sender === currentUserId
                 ? "나"
                 : messageData.senderNickname + "님"}
