@@ -11,10 +11,12 @@ import {
   Button,
   Stack,
   Typography,
+  Divider,
 } from "@mui/joy";
 import SendRoundedIcon from "@mui/icons-material/SendRounded";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { da } from "date-fns/locale";
+import GoBackButton from "./GoBackButton";
 
 const socket = io("http://localhost:4000"); // 여기에서 4000번 포트를 확인
 
@@ -24,6 +26,7 @@ const ChatRoom = () => {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const [currentUserId, setCurrentUserId] = useState(null);
+  const [chatRoomInfo, setChatRoomInfo] = useState(null);
 
   // 유저 정보 가져오기
   useEffect(() => {
@@ -50,10 +53,21 @@ const ChatRoom = () => {
       }
     });
 
+    // 체팅방 정보 가져오기
+    const chatRoomRef = ref(database, `chatRooms/${roomId}`);
+    onValue(chatRoomRef, (snapshot) => {
+      if (snapshot.exists()) {
+        setChatRoomInfo(snapshot.val());
+      } else {
+        console.error("채팅방 정보를 찾을 수 없습니다.");
+      }
+    });
+
     // 컴포넌트 언마운트 시 clean up
     return () => {
       socket.emit("leave room", roomId); // 채팅방을 떠날 때
       socket.off("chat message"); // 메시지 수신 이벤트 해제
+      off(chatRoomRef);
     };
   }, [roomId]);
 
@@ -63,10 +77,16 @@ const ChatRoom = () => {
       const user = auth.currentUser;
 
       if (user) {
+        const senderNickname =
+          currentUserId === chatRoomInfo.authorUid
+            ? chatRoomInfo.authorNickname
+            : chatRoomInfo.applicantUid;
+
         const messageData = {
           roomId,
           text: input,
           sender: currentUserId,
+          senderNickname: senderNickname,
           timestamp: serverTimestamp(), // 서버 시간 저장
         };
 
@@ -107,23 +127,85 @@ const ChatRoom = () => {
     }
   };
 
+  // 채팅 메시지 시간 표시
+
+  const formatTimestamp = (timestamp) => {
+    if (!timestamp) return " ";
+    const date = new Date(timestamp);
+    return date.toLocaleTimeString("ko-KR", {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
+
   return (
-    <Sheet>
-      <div>
-        <Typography>{roomId}</Typography>
-        {messages.map((messageData, index) => (
-          <Typography
+    <Box sx={{ maxWidth: "60%", minWidth: "auto" }}>
+      <GoBackButton />
+      <Typography>{roomId}</Typography>
+      <Divider />
+
+      {messages.map((messageData, index) => (
+        <Box
+          sx={{
+            marginBottom: 1, // 각 메시지 간의 세로 간격을 줄이기 위해 marginBottom을 추가
+          }}
+        >
+          <Box
             sx={{
-              fontSize: "sm",
-              textAlign:
-                messageData.sender === currentUserId ? "right" : "left",
+              display: "flex",
+              flexDirection: "column",
+              alignItems:
+                messageData.sender === currentUserId
+                  ? "flex-end"
+                  : "flex-start",
             }}
             key={index}
           >
-            {messageData.text}
-          </Typography>
-        ))}
-      </div>
+            <Typography level="body-xs">
+              {messageData.sender === currentUserId
+                ? "나"
+                : messageData.senderNickname + "님"}
+            </Typography>
+            <Sheet
+              sx={{
+                p: 1.25,
+                borderRadius: "lg",
+                fontSize: "sm",
+
+                textAlign:
+                  messageData.sender === currentUserId ? "right" : "left",
+                borderTopRightRadius:
+                  messageData.sender === currentUserId ? 0 : "lg",
+                borderTopLeftRadius:
+                  messageData.sender === currentUserId ? "lg" : 0,
+                backgroundColor:
+                  messageData.sender === currentUserId
+                    ? "var(--joy-palette-primary-solidBg)"
+                    : "var(--joy-palette-neutral-100, #F0F4F8)",
+                display: "inline-block", // 부모 요소의 크기가 자식의 콘텐츠에 맞춰 조정됨
+                wordBreak: "break-word", // 긴 단어가 넘칠 경우 줄 바꿈
+                maxWidth: "60%", // 메시지 길이에 맞게 최대 너비를 설정 (여기서는 70%로 설정, 필요에 따라 조정)
+              }}
+            >
+              <Typography
+                level="body-sm"
+                sx={{
+                  color:
+                    messageData.sender === currentUserId
+                      ? "var(--joy-palette-common-white)"
+                      : "var(--joy-palette-text-primary)",
+                }}
+              >
+                {messageData.text}
+              </Typography>
+            </Sheet>
+            <Typography level="body-xs">
+              {formatTimestamp(messageData.timestamp)}
+            </Typography>
+          </Box>
+        </Box>
+      ))}
+
       <Box>
         <form onSubmit={handleSubmit}>
           <FormControl>
@@ -150,7 +232,7 @@ const ChatRoom = () => {
           </FormControl>
         </form>
       </Box>
-    </Sheet>
+    </Box>
   );
 };
 

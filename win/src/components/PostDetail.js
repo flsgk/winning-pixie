@@ -82,6 +82,27 @@ function PostDetail() {
     };
   }, [id, auth]);
 
+  // 채팅방 상태를 Firebase에서 가져와서 상태 업데이트
+  useEffect(() => {
+    const userRef = ref(database, `posts/${id}/applicants`);
+    onValue(userRef, (snapshot) => {
+      if (snapshot.exists()) {
+        const applicants = snapshot.val();
+        const updatedApplicants = Object.values(applicants);
+
+        setApplicants(updatedApplicants);
+
+        // 현재 사용자의 roomId 확인
+        const currentUserApplicant = updatedApplicants.find(
+          (applicant) => applicant.nickname === formData.nickname
+        );
+        if (currentUserApplicant && currentUserApplicant.roomId) {
+          setIsApplicant(true);
+        }
+      }
+    });
+  }, [id, formData.nickname]); // 변경되는 값에 따라 새로 데이터 가져오기
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({
@@ -149,6 +170,7 @@ function PostDetail() {
             roomId: newRoomKey,
             authorUid,
             applicantUid,
+            authorNickname: post.authorNickname,
             postId: id,
             messages: [],
             createdAt: new Date().toISOString(),
@@ -191,6 +213,7 @@ function PostDetail() {
 
           <Typography level="body-xs">작성일: {post.createdDate}</Typography>
         </Box>
+        <Typography level="body-xs">{post.authorNickname}님</Typography>
 
         <div dangerouslySetInnerHTML={{ __html: post.content }}></div>
 

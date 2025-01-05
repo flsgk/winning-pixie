@@ -13,6 +13,9 @@ import Stack from "@mui/joy/Stack";
 import Button from "@mui/joy/Button";
 import Box from "@mui/joy/Box";
 import GoBackButton from "./GoBackButton";
+import { auth, database } from "../firebase";
+import { getAuth } from "firebase/auth";
+import { onValue, ref } from "firebase/database";
 
 function Write() {
   const navigate = useNavigate();
@@ -32,6 +35,21 @@ function Write() {
   const [teams, setTeams] = useState([...initialTeams, "기타"]); // '기타' 추가
   const [yourTeam, setYourTeam] = useState(""); // '선택'으로 초기화
   const [myTeam, setMyTeam] = useState("");
+  const [nickname, setNickname] = useState(""); // 현재 사용자의 닉네임 상태 추가
+
+  useEffect(() => {
+    // 현재 사용자 정보 가져오기 (닉네임)
+    const user = auth.currentUser;
+    if (user) {
+      const userRef = ref(database, `users/${user.uid}`);
+      onValue(userRef, (snapshot) => {
+        if (snapshot.exists()) {
+          const userData = snapshot.val();
+          setNickname(userData.nickname);
+        }
+      });
+    }
+  }, [auth]);
 
   console.log(teams); // teams 배열을 확인하여 정상적으로 팀들이 전달되는지 확인
 
@@ -48,6 +66,7 @@ function Write() {
       myTeam: myTeam,
       createdDate,
       yourTeam: yourTeam,
+      authorNickname: nickname,
     };
 
     console.log("newPost:", newPost); // 값이 제대로 설정되는지 확인
