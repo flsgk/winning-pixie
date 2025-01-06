@@ -26,17 +26,18 @@ import { getAuth, onAuthStateChanged } from "firebase/auth";
 
 import GoBackButton from "./GoBackButton";
 
-const socket = io("http://localhost:4000"); // 여기에서 4000번 포트를 확인
+const socket = io("http://localhost:4000"); // 서버와 웹소켓 통신 설정, 여기에서 4000번 포트를 확인
 
 const ChatRoom = () => {
   const { roomId } = useParams();
+  console.log(roomId); // roomId 값 확인
   const { id } = useParams(); // URL에서 ID 가져오기
 
-  const [messages, setMessages] = useState([]);
-  const [input, setInput] = useState("");
-  const [currentUserId, setCurrentUserId] = useState(null);
-  const [chatRoomInfo, setChatRoomInfo] = useState(null);
-  const [gameInfo, setGameInfo] = useState(null);
+  const [messages, setMessages] = useState([]); // 채팅 메시지 저장
+  const [input, setInput] = useState(""); // 입력 중인 메시지
+  const [currentUserId, setCurrentUserId] = useState(null); // 현재 사용자 Id
+  const [chatRoomInfo, setChatRoomInfo] = useState(null); // 채팅방 정보
+  const [gameInfo, setGameInfo] = useState(null); // 경기 정보
 
   // 유저 정보 가져오기
   useEffect(() => {
@@ -51,7 +52,7 @@ const ChatRoom = () => {
     return () => unsubscribe();
   }, []);
 
-  // 컴포넌트가 마운트되면 해당 채팅방에 대한 메시지를 받기 시작
+  // 채팅방 입장 및 메시지 수신
   useEffect(() => {
     // 방에 입장
     socket.emit("join room", roomId);
@@ -65,7 +66,6 @@ const ChatRoom = () => {
 
     // 체팅방 정보 가져오기
 
-    // chatRoomInfo가 올바르게 로드되었는지 확인
     console.log(chatRoomInfo); // chatRoomInfo가 제대로 로드되었는지 확인
     const chatRoomRef = ref(database, `chatRooms/${roomId}`);
     onValue(chatRoomRef, (snapshot) => {
@@ -100,6 +100,10 @@ const ChatRoom = () => {
       const user = auth.currentUser;
 
       if (user) {
+        if (!chatRoomInfo) {
+          console.error("채팅방 정보(chatRoomInfo)가 로드되지 않았습니다.");
+          return; // chatRoomInfo가 null이면 실행하지 않음
+        }
         const senderNickname =
           currentUserId === chatRoomInfo.authorUid
             ? chatRoomInfo.authorNickname
@@ -151,7 +155,6 @@ const ChatRoom = () => {
   };
 
   // 채팅 메시지 시간 표시
-
   const formatTimestamp = (timestamp) => {
     if (!timestamp) return " ";
     const date = new Date(timestamp);
@@ -162,7 +165,6 @@ const ChatRoom = () => {
   };
 
   // 유저 선택 상태 변경하기
-
   const handleUpdateParticipants = () => {
     // posts 경로에서 해당 포스트 데이터 가져오기
     const postRef = ref(database, `posts/${id}`);

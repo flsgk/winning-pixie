@@ -154,6 +154,7 @@ function PostDetail() {
       };
     }
   }, [id, formData.nickname]); // id와 nickname이 바뀔 때마다 상태 업데이트
+
   // 채팅방 처리
   const handleChat = async (applicant, index) => {
     try {
@@ -170,6 +171,7 @@ function PostDetail() {
           roomId: newRoomKey,
           authorUid: auth.currentUser?.uid,
           applicantUid: applicant.nickname,
+          authorNickname: post.authorNickname,
           postId: id,
           messages: [],
           createdAt: new Date().toISOString(),
