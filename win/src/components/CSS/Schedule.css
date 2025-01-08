@@ -35,7 +35,7 @@
   vertical-align: middle;
 }
 
-/* Tody Cell에 배경색 주기 */          
+/* Tody Cell에 배경색 주기 */
 .fc .fc-daygrid-day.fc-day-today {
   background-color: #f5ff8bbb;
 }
@@ -59,8 +59,15 @@
   padding: 2px 8px;
   margin-bottom: 5px;
   border: none;
-  border-radius: 15px;
+  border-radius: 10px;
   font-weight: 500;
   font-size: 14px;
-  background-color: black;
 }
+
+/* .fc-event :hover {
+  cursor: pointer;
+  border: none;
+  border-radius: 10px;
+  font-weight: 500;
+  font-size: 14px;
+} */

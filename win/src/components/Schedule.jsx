@@ -96,6 +96,16 @@ function Schedule({ selectedTeam, onEventClick }) {
     }
   };
 
+  const handleEventMouseEnter = (info) => {
+    info.el.style.opacity = "0.8";
+    info.el.style.cursor = "pointer"; // 커서를 포인터로 변경
+  };
+
+  const handleEventMouseLeave = (info) => {
+    info.el.style.opacity = "1";
+    info.el.style.cursor = ""; // 커서를 포인터로 변경
+  };
+
   useEffect(() => {
     if (!selectedTeam) return;
     // 초기 로드 시 현재 월의 데이터를 가져오도록
@@ -129,6 +139,8 @@ function Schedule({ selectedTeam, onEventClick }) {
           eventClick={handleEventClick} // 이벤트 클릭 핸들러 추가
           width="100%" // 달력의 너비를 100%로 설정하여 가득 차게 함
           contentHeight="400px" // 달력 높이를 고정하여 6줄 이상 나오지 않도록 설정
+          eventMouseEnter={handleEventMouseEnter}
+          eventMouseLeave={handleEventMouseLeave}
         />
       </Box>
     </div>
