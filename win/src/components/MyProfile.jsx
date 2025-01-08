@@ -112,6 +112,11 @@ function MyProfile() {
       profileData.nickname
     );
     if (isNicknameDuplicate) {
+      if (profileData.nickname == originalProfileData.nickname) {
+        setIsNicknameDuplicate(false);
+        await updateUserProfile(profileData);
+        return;
+      }
       setError("이미 사용 중인 닉네임입니다. 다른 닉네임을 입력해주세요.");
       setIsNicknameDuplicate(true); // 닉네임 중복 상태 true로 설정
       return;
