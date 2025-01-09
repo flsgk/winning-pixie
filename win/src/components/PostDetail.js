@@ -220,11 +220,11 @@ function PostDetail() {
           })}
         </Typography>
         <Typography level="body-sm">
-          {post.yourTeam}의 승리요정을 찾고 있어요!
+          {post.yourTeam} 팀의 승리요정을 찾고 있어요!
         </Typography>
 
         {isAuthor ? (
-          <Button>편집하기</Button>
+          <Button onClick={() => navigate(`/edit/${id}`)}>편집하기</Button>
         ) : (
           !isApplicant &&
           !applying && (

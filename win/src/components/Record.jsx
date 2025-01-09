@@ -21,7 +21,6 @@ import "./CSS/DatePicker.css";
 import { database } from "../firebase";
 import { ref, set } from "firebase/database";
 import { getAuth } from "firebase/auth";
-import { useLocation } from "react-router-dom";
 
 // api 호출 함수
 const fetchGameData = async (year, month, team) => {

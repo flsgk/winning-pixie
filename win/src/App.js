@@ -15,6 +15,7 @@ import PostDetail from "./components/PostDetail.js";
 import MyPage from "./components/MyPage.jsx";
 import Record from "./components/Record.jsx";
 import ChatRoom from "./components/ChatRoom.jsx";
+import EditPost from "./components/EditPost.jsx";
 
 function App() {
   const dispatch = useDispatch();
@@ -113,7 +114,16 @@ function App() {
             path="/record"
             element={<Record selectedTeam={selectedTeam} />}
           ></Route>
-          <Route path="/post/:id" element={<PostDetail />}></Route>
+          <Route
+            path="/post/:id"
+            selectedTeam={selectedTeam}
+            element={<PostDetail />}
+          ></Route>
+          <Route
+            path="/edit/:id"
+            selectedTeam={selectedTeam}
+            element={<EditPost />}
+          />
           <Route path="/post/:id/chat/:roomId" element={<ChatRoom />} />
         </Routes>
       </div>
