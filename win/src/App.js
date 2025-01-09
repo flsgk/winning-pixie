@@ -114,16 +114,8 @@ function App() {
             path="/record"
             element={<Record selectedTeam={selectedTeam} />}
           ></Route>
-          <Route
-            path="/post/:id"
-            selectedTeam={selectedTeam}
-            element={<PostDetail />}
-          ></Route>
-          <Route
-            path="/edit/:id"
-            selectedTeam={selectedTeam}
-            element={<EditPost />}
-          />
+          <Route path="/post/:id" element={<PostDetail />}></Route>
+          <Route path="/edit/:id" element={<EditPost />} />
           <Route path="/post/:id/chat/:roomId" element={<ChatRoom />} />
         </Routes>
       </div>
