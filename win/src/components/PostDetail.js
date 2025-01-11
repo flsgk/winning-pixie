@@ -1,8 +1,10 @@
+// PostDetail.js
+
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ref, get, update, onValue, set } from "firebase/database";
 import { database } from "../firebase";
-import { getAuth } from "firebase/auth";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
 import {
   Button,
   Box,
@@ -39,8 +41,15 @@ function PostDetail() {
     team: "",
   });
 
+  const [editData, setEditData] = useState({
+    nickname: "",
+    memo: "",
+    team: "",
+  });
+
   const [applicants, setApplicants] = useState([]); // 해당 게시물에 참가 신청한 사람들의 정보
   const [isApplicant, setIsApplicant] = useState(false); // 사용자가 이미 참가 신청을 했는지
+  const [isEdit, setIsEdit] = useState(false);
 
   // 사용자 정보 가져오기 : 유저가 로그인한 상태에서 유저 닉네임을 가져와서 formData에 업데이트하기
   useEffect(() => {
@@ -104,6 +113,7 @@ function PostDetail() {
 
     const newApplicant = {
       nickname,
+      uid: applicantId,
       memo: formData.memo,
       team,
       status: "pending",
@@ -117,6 +127,65 @@ function PostDetail() {
 
       // 로컬 스토리지에 신청 상태 저장하기
       localStorage.setItem(`applicant_${id}`, JSON.stringify(newApplicant)); // 자바스크립트 객체를 JSON 문자열로 변환
+    } catch (error) {}
+  };
+
+  useEffect(() => {
+    if (!currentUser) {
+      console.log("사용자 정보가 로드되지 않았습니다.");
+      return; // currentUser가 없으면 함수 종료
+    }
+
+    console.log("id 값:", id);
+    console.log("uid 값:", currentUser.uid);
+
+    const postRef = ref(database, `posts/${id}/applicants/${currentUser.uid}`);
+    const unsubscribe = onValue(postRef, (snapshot) => {
+      if (snapshot.exists()) {
+        const userData = snapshot.val();
+        console.log("불러온 데이터:", userData); // 콘솔로 데이터 확인
+        setEditData(userData);
+      } else {
+        console.log("사용자 데이터 로드 실패:");
+      }
+    });
+
+    return () => unsubscribe(); // 효과가 종료될 때 리스너 제거
+  }, [id, currentUser]); // currentUser가 변경될 때마다 다시 실행
+
+  // 입력 필드 수정 처리
+  const handleEdit = async (e) => {
+    e.preventDefault();
+
+    const { nickname, team } = editData;
+
+    console.log(isApplicant); // 상태 값 확인
+    console.log(editData.nickname, editData.team); // 값을 확인
+    console.log(currentUser); // currentUser 객체 확인
+
+    if (!nickname || !team || !isApplicant) {
+      return;
+    }
+
+    const applicantId = currentUser.uid; // Firebase의 UID를 사용
+
+    const editApplicant = {
+      nickname,
+      uid: applicantId, // 참가자의 UID 추가
+      memo: editData.memo,
+      team: editData.team,
+      status: "pending",
+    };
+    const postRef = ref(database, `posts/${id}/applicants/${applicantId}`);
+    console.log(postRef); // 경로 확인
+
+    try {
+      await update(postRef, editApplicant); // 참가자 정보 추가하기
+      setIsEdit(false); // 모달 닫기
+      setIsApplicant(true); // 참가 완료 상태로 업데이트
+
+      // 로컬 스토리지에 신청 상태 저장하기
+      localStorage.setItem(`applicant_${id}`, JSON.stringify(editApplicant)); // 자바스크립트 객체를 JSON 문자열로 변환
     } catch (error) {}
   };
 
@@ -305,6 +374,76 @@ function PostDetail() {
         </Modal>
       )}
 
+      {isEdit && (
+        <Modal
+          open={isEdit}
+          onClose={() => setIsEdit(false)}
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <ModalDialog>
+            <ModalClose
+              variant="plain"
+              sx={{ m: 1 }}
+              onClick={() => setIsEdit(false)}
+            />
+            <DialogTitle>참여 신청</DialogTitle>
+            <DialogContent> 요정님의 정보를 입력해주세요.</DialogContent>
+            <form onSubmit={handleEdit}>
+              <Stack spacing={2}>
+                <FormControl>
+                  <FormLabel>닉네임</FormLabel>
+                  <Input
+                    type="text"
+                    name="nickname"
+                    value={editData.nickname}
+                    disabled
+                  />
+                </FormControl>
+
+                <FormControl>
+                  <FormLabel>메모(선택)</FormLabel>
+                  <Textarea
+                    name="memo"
+                    value={editData.memo}
+                    onChange={(e) =>
+                      setEditData({ ...editData, memo: e.target.value })
+                    }
+                  />
+                </FormControl>
+
+                <FormControl>
+                  <FormLabel>응원하는 팀</FormLabel>
+                  <Select
+                    name="team"
+                    value={editData.team}
+                    onChange={(e, newValue) =>
+                      setEditData({ ...editData, team: newValue })
+                    }
+                  >
+                    <Option value="두산">두산</Option>
+                    <Option value="LG">LG</Option>
+                    <Option value="KIA">KIA</Option>
+                    <Option value="NC">NC</Option>
+                    <Option value="KT">KT</Option>
+                    <Option value="한화">한화</Option>
+                    <Option value="삼성">삼성</Option>
+                    <Option value="키움">키움</Option>
+                    <Option value="SSG">SSG</Option>
+                    <Option value="롯데">롯데</Option>
+                  </Select>
+                </FormControl>
+
+                <Button type="submit">수정하기</Button>
+              </Stack>
+            </form>
+          </ModalDialog>
+        </Modal>
+      )}
+
       {post.applicants && (
         <Box sx={{ marginTop: 2 }}>
           <Typography level="h3">참여하고 싶어요!</Typography>
@@ -331,6 +470,14 @@ function PostDetail() {
                 >
                   {applicant.status}
                 </Chip>
+                {!isAuthor && applicant.nickname === formData.nickname && (
+                  <Button
+                    disabled={applicant.status === "종료"}
+                    onClick={() => setIsEdit(true)}
+                  >
+                    수정하기
+                  </Button>
+                )}
                 {isAuthor ? (
                   <Button onClick={() => handleChat(applicant, index)}>
                     {applicant.roomId ? "채팅 이동하기" : "채팅하기"}

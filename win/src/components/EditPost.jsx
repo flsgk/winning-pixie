@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import Write from "./Write";
 import { database } from "../firebase";
 import { get, onValue, ref, update } from "firebase/database";
 import { useNavigate, useParams } from "react-router-dom";
@@ -53,7 +52,6 @@ const EditPost = () => {
   });
 
   // 게시물 정보 가져오기
-
   useEffect(() => {
     const fetchPosts = async () => {
       try {
