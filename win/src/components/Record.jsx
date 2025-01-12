@@ -21,6 +21,7 @@ import "./CSS/DatePicker.css";
 import { database } from "../firebase";
 import { ref, set } from "firebase/database";
 import { getAuth } from "firebase/auth";
+import ReactEditor from "./ReactEditor";
 
 // api 호출 함수
 const fetchGameData = async (year, month, team) => {
@@ -45,6 +46,13 @@ const Record = ({ selectedTeam }) => {
   const [selectedLocation, setSelectedLocation] = useState("");
   const [text, setText] = useState("");
   const [userId, setUserId] = useState(null);
+  const customModules = {
+    toolbar: [
+      ["bold", "italic"], // 굵게, 기울임만 표시
+      [{ list: "ordered" }], // 순서 있는 리스트만 표시
+      ["image"],
+    ],
+  };
 
   // Firebase에서 로그인 된 사용자 ID 가져오기
   useEffect(() => {
@@ -255,13 +263,11 @@ const Record = ({ selectedTeam }) => {
               </Stack>
               <FormControl>
                 <FormLabel>직관 일기</FormLabel>
-                <Textarea
-                  minRows={2}
+
+                <ReactEditor
                   value={text}
-                  onChange={(event) => setText(event.target.value)}
-                  sx={{
-                    width: 500,
-                  }}
+                  onChange={setText}
+                  modules={customModules}
                 />
               </FormControl>
 

@@ -16,6 +16,7 @@ import MyPage from "./components/MyPage.jsx";
 import Record from "./components/Record.jsx";
 import ChatRoom from "./components/ChatRoom.jsx";
 import EditPost from "./components/EditPost.jsx";
+import RecordDetail from "./components/RecordDetail.jsx";
 
 function App() {
   const dispatch = useDispatch();
@@ -87,9 +88,7 @@ function App() {
             path="/schedule"
             element={<Schedule selectedTeam={selectedTeam} />}
           />
-
           <Route path="/write" element={<Write />} />
-
           <Route
             path="/signup"
             element={<Signup onSignupSuccess={() => setIsLoggedIn(true)} />}
@@ -114,6 +113,10 @@ function App() {
             path="/record"
             element={<Record selectedTeam={selectedTeam} />}
           ></Route>
+          <Route
+            path="/users/:uid/records/:team/:date"
+            element={<RecordDetail selectedTeam={selectedTeam} />}
+          />{" "}
           <Route path="/post/:id" element={<PostDetail />}></Route>
           <Route path="/edit/:id" element={<EditPost />} />
           <Route path="/post/:id/chat/:roomId" element={<ChatRoom />} />

@@ -10,13 +10,12 @@ import {
   ButtonGroup,
 } from "@mui/joy";
 
-import { fi } from "date-fns/locale";
-import { getAuth } from "firebase/auth";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { get, getDatabase, ref } from "firebase/database";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-function WinningRate({ selectedTeam }) {
+function WinningRate({ selectedTeam, date }) {
   const [userId, setUserId] = useState(null);
   const [winningRate, setWinningRate] = useState(0);
   const initialYear = new Date().getFullYear();
@@ -28,15 +27,17 @@ function WinningRate({ selectedTeam }) {
     setSelectedYear(year);
   };
 
-  // 로그인된 사용자 ID 가져오기
+  // Firebase 인증 상태를 확인하여 userId 설정
   useEffect(() => {
     const auth = getAuth();
-    const user = auth.currentUser;
-    if (user) {
-      setUserId(user.uid);
-    } else {
-      console.log("로그인되지 않은 사용자");
-    }
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setUserId(user.uid);
+      } else {
+        console.log("로그인되지 않은 사용자");
+      }
+    });
+    return () => unsubscribe(); // 컴포넌트 언마운트 시 리스너 제거
   }, []);
 
   // firebase 에서 유저의 기록 가져오기
@@ -50,7 +51,7 @@ function WinningRate({ selectedTeam }) {
       try {
         const snapshot = await get(recordsRef);
         if (snapshot.exists()) {
-          console.log("Fetched Records:", snapshot.val());
+          console.log("Fetched First Records:", snapshot.val());
           // 가져온 데이터를 활용
           const records = snapshot.val();
 
@@ -79,6 +80,11 @@ function WinningRate({ selectedTeam }) {
 
     fetchUserRecords();
   }, [userId, selectedTeam, selectedYear]);
+
+  const handleClick = (recordDate) => {
+    const path = `users/${userId}/records/${selectedTeam}/${recordDate}`;
+    navigate(`/${path}`);
+  };
 
   return (
     <div>
@@ -121,6 +127,7 @@ function WinningRate({ selectedTeam }) {
               display: "flex",
               alignItems: "center",
             }}
+            onClick={() => handleClick(record.date)}
           >
             <CardOverflow
               variant="soft"
