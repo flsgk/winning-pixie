@@ -1,7 +1,5 @@
-import { useState } from "react";
-import ReactQuill from "react-quill-new";
-import "react-quill-new/dist/quill.snow.css"; //React Quill 기본 테마
-import "./CSS/ReactEditor.css";
+import ReactQuill from "react-quill";
+import "react-quill/dist/quill.snow.css";
 
 const ReactEditor = ({ value, onChange, modules }) => {
   // 툴바에 표시할 모듈 설정
@@ -13,7 +11,6 @@ const ReactEditor = ({ value, onChange, modules }) => {
       [{ color: [] }, { background: [] }],
       [{ list: "ordered" }, { list: "bullet" }],
       [{ align: [] }],
-      ["image"],
     ],
   };
 

@@ -13,15 +13,18 @@ import {
   Textarea,
   Typography,
 } from "@mui/joy";
-import React, { useEffect, useState } from "react";
+import React, { memo, useEffect, useRef, useState } from "react";
 import DatePicker from "react-datepicker";
-import { el, ko } from "date-fns/locale"; // date-fns에서 한국어 로케일 가져오기
+import { ko } from "date-fns/locale"; // date-fns에서 한국어 로케일 가져오기
 import "./CSS/DatePicker.css";
 
 import { database } from "../firebase";
 import { ref, set } from "firebase/database";
 import { getAuth } from "firebase/auth";
 import ReactEditor from "./ReactEditor";
+import s3 from "../awsS3";
+import ReactQuill from "react-quill";
+import "react-quill/dist/quill.snow.css";
 
 // api 호출 함수
 const fetchGameData = async (year, month, team) => {
@@ -46,12 +49,60 @@ const Record = ({ selectedTeam }) => {
   const [selectedLocation, setSelectedLocation] = useState("");
   const [text, setText] = useState("");
   const [userId, setUserId] = useState(null);
-  const customModules = {
-    toolbar: [
-      ["bold", "italic"], // 굵게, 기울임만 표시
-      [{ list: "ordered" }], // 순서 있는 리스트만 표시
-      ["image"],
-    ],
+  const quillRef = useRef(null);
+
+  const uploadImageToS3 = async (file) => {
+    const params = {
+      Bucket: process.env.REACT_APP_BUCKET_NAME,
+      Key: `${Date.now()}-${file.name}`,
+      Body: file,
+      ContentType: file.type,
+      ACL: "public-read",
+    };
+
+    try {
+      const upload = await s3.upload(params).promise();
+      return upload.Location;
+    } catch (error) {
+      console.error("Error uploading image:", error);
+      throw new Error("Image upload failed");
+    }
+  };
+
+  const handleImageUpload = () => {
+    if (!quillRef.current) return;
+
+    const input = document.createElement("input");
+    input.setAttribute("type", "file");
+    input.setAttribute("accept", "image/*");
+    input.click();
+
+    // 파일 선택 후 실행되는 이벤트 핸들러
+    input.onchange = async () => {
+      const file = input.files[0]; // 사용자가 선택한 파일
+
+      if (file) {
+        const imageUrl = await uploadImageToS3(file); // S3에 업로드
+        const quill = quillRef.current.getEditor(); // Quill 인스턴스 가져오기
+        const range = quill.getSelection();
+
+        quill.insertEmbed(range.index, "image", imageUrl); // 에디터에 이미지 삽입
+      }
+    };
+  };
+
+  const modules = {
+    toolbar: {
+      container: [
+        [{ header: [1, 2, false] }],
+        ["bold", "italic", "underline"],
+        [{ list: "ordered" }, { list: "bullet" }],
+        ["image"], // 이미지 버튼 추가
+      ],
+      handlers: {
+        image: handleImageUpload, // 이미지 핸들러 연결
+      },
+    },
   };
 
   // Firebase에서 로그인 된 사용자 ID 가져오기
@@ -134,8 +185,10 @@ const Record = ({ selectedTeam }) => {
             day
           ).padStart(2, "0")}`,
         });
+        setText("");
       } else {
         setGameInfo(null);
+        setText("");
       }
     } catch (error) {
       console.error("Error fetching game for date:", error);
@@ -151,6 +204,11 @@ const Record = ({ selectedTeam }) => {
     if (myScore > oppScore) return "승";
     if (myScore < oppScore) return "패";
     return "무";
+  };
+
+  const handleTextChange = (value) => {
+    console.log("New Text:", value);
+    setText(value); // 상태 업데이트
   };
 
   return (
@@ -261,15 +319,23 @@ const Record = ({ selectedTeam }) => {
                   />
                 </Stack>
               </Stack>
-              <FormControl>
-                <FormLabel>직관 일기</FormLabel>
+              <Box>
+                <FormControl>
+                  <FormLabel>직관 일기</FormLabel>
 
-                <ReactEditor
-                  value={text}
-                  onChange={setText}
-                  modules={customModules}
-                />
-              </FormControl>
+                  <ReactQuill
+                    key={gameInfo?.date} // 날짜가 바뀔 때 에디터를 재렌더링
+                    className="custom-editor"
+                    theme="snow"
+                    ref={quillRef} // quillRef를 에디터에 연결
+                    value={text} // text 상태를 value로 설정
+                    onChange={handleTextChange} // 상태 업데이트
+                    placeholder="Start writing here..."
+                    style={{ width: "100%", minHeight: "300px" }} // 스타일 조정
+                    modules={modules}
+                  />
+                </FormControl>
+              </Box>
 
               <Button onClick={saveRecord}>저장</Button>
             </Card>
