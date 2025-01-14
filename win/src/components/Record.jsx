@@ -148,6 +148,11 @@ const Record = ({ selectedTeam }) => {
       return;
     }
 
+    if (!selectedLocation) {
+      alert("장소를 선택해 주세요.");
+      return;
+    }
+
     const recordData = {
       date: gameInfo.date,
       location: selectedLocation,
@@ -208,6 +213,7 @@ const Record = ({ selectedTeam }) => {
             day
           ).padStart(2, "0")}`,
         });
+        setText("");
       } else {
         setGameInfo(null);
         setText("");
