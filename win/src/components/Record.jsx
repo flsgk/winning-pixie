@@ -13,7 +13,14 @@ import {
   Textarea,
   Typography,
 } from "@mui/joy";
-import React, { memo, useEffect, useRef, useState } from "react";
+import React, {
+  memo,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import DatePicker from "react-datepicker";
 import { ko } from "date-fns/locale"; // date-fns에서 한국어 로케일 가져오기
 import "./CSS/DatePicker.css";
@@ -21,10 +28,10 @@ import "./CSS/DatePicker.css";
 import { database } from "../firebase";
 import { ref, set } from "firebase/database";
 import { getAuth } from "firebase/auth";
-import ReactEditor from "./ReactEditor";
-import s3 from "../awsS3";
 import ReactQuill from "react-quill";
-import "react-quill/dist/quill.snow.css";
+import "react-quill/dist/quill.snow.css"; // Quill 기본 스타일
+import AWS from "aws-sdk";
+import { useNavigate } from "react-router-dom";
 
 // api 호출 함수
 const fetchGameData = async (year, month, team) => {
@@ -50,60 +57,74 @@ const Record = ({ selectedTeam }) => {
   const [text, setText] = useState("");
   const [userId, setUserId] = useState(null);
   const quillRef = useRef(null);
+  const navigate = useNavigate();
 
-  const uploadImageToS3 = async (file) => {
+  // AWS S3 설정
+  AWS.config.update({
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+    region: process.env.AWS_REGION,
+  });
+  const s3 = new AWS.S3();
+
+  // 이미지 업로드 함수
+  const uploadToS3 = async (file) => {
     const params = {
-      Bucket: process.env.REACT_APP_BUCKET_NAME,
-      Key: `${Date.now()}-${file.name}`,
+      Bucket: "winning-pixie-test", // S3 버킷 이름
+      Key: `images/${file.name}`, // 업로드될 경로 (예: images/myImage.jpg)
       Body: file,
-      ContentType: file.type,
-      ACL: "public-read",
+      ContentType: file.type, // 파일 MIME 타입
+      ACL: "public-read", // 퍼블릭 읽기 권한
     };
+    console.log("Uploading file to S3", params); // 로그 추가
 
     try {
-      const upload = await s3.upload(params).promise();
-      return upload.Location;
+      const data = await s3.upload(params).promise();
+      console.log("File uploaded successfully:", data); // 업로드 성공 로그
+      return data.Location; // 업로드된 이미지 URL 반환
     } catch (error) {
-      console.error("Error uploading image:", error);
-      throw new Error("Image upload failed");
+      console.error("파일 업로드 실패:", error); // 실패 로그
+      return null;
     }
   };
 
-  const handleImageUpload = () => {
-    if (!quillRef.current) return;
-
+  // 이미지 삽입을 위한 custom handler
+  const handleImage = () => {
     const input = document.createElement("input");
     input.setAttribute("type", "file");
     input.setAttribute("accept", "image/*");
     input.click();
 
-    // 파일 선택 후 실행되는 이벤트 핸들러
-    input.onchange = async () => {
-      const file = input.files[0]; // 사용자가 선택한 파일
-
+    input.onchange = async (e) => {
+      const file = e.target.files[0];
       if (file) {
-        const imageUrl = await uploadImageToS3(file); // S3에 업로드
-        const quill = quillRef.current.getEditor(); // Quill 인스턴스 가져오기
-        const range = quill.getSelection();
-
-        quill.insertEmbed(range.index, "image", imageUrl); // 에디터에 이미지 삽입
+        // S3에 파일 업로드
+        const imageUrl = await uploadToS3(file);
+        if (imageUrl) {
+          if (quillRef.current) {
+            const quill = quillRef.current.getEditor();
+            const range = quill.getSelection();
+            quill.insertEmbed(range.index, "image", imageUrl);
+          }
+        }
       }
     };
   };
 
-  const modules = {
-    toolbar: {
-      container: [
-        [{ header: [1, 2, false] }],
-        ["bold", "italic", "underline"],
-        [{ list: "ordered" }, { list: "bullet" }],
-        ["image"], // 이미지 버튼 추가
-      ],
-      handlers: {
-        image: handleImageUpload, // 이미지 핸들러 연결
+  const modules = useMemo(
+    () => ({
+      toolbar: {
+        container: [
+          ["bold", "italic", "underline"],
+          ["link", "image"], // 이미지 버튼
+        ],
+        handlers: {
+          image: handleImage, // 이미지 버튼 클릭 시 호출될 함수
+        },
       },
-    },
-  };
+    }),
+    []
+  );
 
   // Firebase에서 로그인 된 사용자 ID 가져오기
   useEffect(() => {
@@ -126,6 +147,7 @@ const Record = ({ selectedTeam }) => {
       alert("저장할 경기 정보가 없습니다.");
       return;
     }
+
     const recordData = {
       date: gameInfo.date,
       location: selectedLocation,
@@ -144,6 +166,7 @@ const Record = ({ selectedTeam }) => {
       );
       await set(recordRef, recordData);
       alert("기록이 저장되었습니다!");
+      navigate("/my-page");
     } catch (error) {
       console.error("Error saving record:", error);
       alert("기록 저장 중 오류가 발생했습니다.");
@@ -185,7 +208,6 @@ const Record = ({ selectedTeam }) => {
             day
           ).padStart(2, "0")}`,
         });
-        setText("");
       } else {
         setGameInfo(null);
         setText("");
@@ -204,11 +226,6 @@ const Record = ({ selectedTeam }) => {
     if (myScore > oppScore) return "승";
     if (myScore < oppScore) return "패";
     return "무";
-  };
-
-  const handleTextChange = (value) => {
-    console.log("New Text:", value);
-    setText(value); // 상태 업데이트
   };
 
   return (
@@ -324,15 +341,10 @@ const Record = ({ selectedTeam }) => {
                   <FormLabel>직관 일기</FormLabel>
 
                   <ReactQuill
-                    key={gameInfo?.date} // 날짜가 바뀔 때 에디터를 재렌더링
-                    className="custom-editor"
-                    theme="snow"
-                    ref={quillRef} // quillRef를 에디터에 연결
-                    value={text} // text 상태를 value로 설정
-                    onChange={handleTextChange} // 상태 업데이트
-                    placeholder="Start writing here..."
-                    style={{ width: "100%", minHeight: "300px" }} // 스타일 조정
-                    modules={modules}
+                    value={text}
+                    onChange={setText} // 상태 업데이트
+                    ref={quillRef}
+                    modules={modules} // 모듈에 설정된 툴바 적용
                   />
                 </FormControl>
               </Box>
