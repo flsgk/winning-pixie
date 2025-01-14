@@ -247,56 +247,71 @@ function Home({ isLoggedIn, posts }) {
                           paddingX: 1, // 부모 컨테이너 내부 여백 추가
                         }}
                       >
-                        {displayedPosts.map((post) => (
-                          <Card
-                            key={post.id}
-                            className="post-card"
-                            variant="outlined"
-                            sx={{
-                              width: "90%", // 기본적으로 90% 너비를 차지
-                              marginBottom: 1,
-                              marginTop: 1,
-
-                              "@media (max-width: 800px)": {
-                                width: "100%", // 화면 너비가 600px 이하일 때는 100%로 설정
-                              },
-                            }}
-                          >
-                            <CardContent>
-                              <Box
-                                className="post-header"
+                        {displayedPosts.map(
+                          (post) =>
+                            post.status === "모집 중" && (
+                              <Card
+                                key={post.id}
+                                className="post-card"
+                                variant="outlined"
                                 sx={{
-                                  display: "flex",
-                                  justifyContent: "space-between",
-                                  alignItems: "center",
+                                  width: "90%", // 기본적으로 90% 너비를 차지
+                                  marginBottom: 1,
+                                  marginTop: 1,
+
+                                  "@media (max-width: 800px)": {
+                                    width: "100%", // 화면 너비가 600px 이하일 때는 100%로 설정
+                                  },
                                 }}
                               >
-                                <Typography level="title-lg">
-                                  {post.title}
-                                </Typography>
-                                <Chip size="md" variant="soft">
-                                  {post.yourTeam}
-                                </Chip>
-                              </Box>
+                                <CardContent>
+                                  <Box
+                                    className="post-header"
+                                    sx={{
+                                      display: "flex",
+                                      justifyContent: "space-between",
+                                      alignItems: "center",
+                                    }}
+                                  >
+                                    <Typography level="title-lg">
+                                      {post.title}
+                                    </Typography>
 
-                              <div
-                                dangerouslySetInnerHTML={{
-                                  __html: post.content,
-                                }}
-                              ></div>
+                                    <Chip
+                                      color={
+                                        post.status === "모집 중"
+                                          ? "success"
+                                          : "neutral"
+                                      }
+                                    >
+                                      {post.status}
+                                    </Chip>
+                                  </Box>
+                                  <Chip size="md" variant="soft">
+                                    {post.yourTeam}
+                                  </Chip>
+                                  <div
+                                    dangerouslySetInnerHTML={{
+                                      __html: post.content,
+                                    }}
+                                  ></div>
 
-                              <Typography level="body-sm" className="post-date">
-                                작성일:{post.createdDate}
-                              </Typography>
-                              <Link
-                                to={`/post/${post.id}`}
-                                style={{ textDecoration: "none" }}
-                              >
-                                <Button>자세히 보기</Button>
-                              </Link>
-                            </CardContent>
-                          </Card>
-                        ))}
+                                  <Typography
+                                    level="body-sm"
+                                    className="post-date"
+                                  >
+                                    작성일:{post.createdDate}
+                                  </Typography>
+                                  <Link
+                                    to={`/post/${post.id}`}
+                                    style={{ textDecoration: "none" }}
+                                  >
+                                    <Button>자세히 보기</Button>
+                                  </Link>
+                                </CardContent>
+                              </Card>
+                            )
+                        )}
                       </Box>
                     ) : (
                       <Box sx={{ padding: 2 }}>작성된 글이 없습니다.</Box>

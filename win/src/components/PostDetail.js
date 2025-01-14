@@ -146,7 +146,7 @@ function PostDetail() {
         console.log("불러온 데이터:", userData); // 콘솔로 데이터 확인
         setEditData(userData);
       } else {
-        console.log("사용자 데이터 로드 실패:");
+        console.log("사용자 데이터 로드 실패");
       }
     });
 
@@ -276,9 +276,12 @@ function PostDetail() {
           }}
         >
           <Typography level="h2">{post.title}</Typography>
-          <Typography level="body-xs">작성일: {post.createdDate}</Typography>
+          <Chip color={post.status === "모집 중" ? "success" : "neutral"}>
+            {post.status}
+          </Chip>
         </Box>
         <Typography level="body-xs">{post.authorNickname}님</Typography>
+        <Typography level="body-xs">작성일: {post.createdDate}</Typography>
         <div dangerouslySetInnerHTML={{ __html: post.content }} />
         <Typography level="body-sm">
           경기일:{" "}

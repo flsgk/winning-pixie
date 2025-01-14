@@ -164,16 +164,21 @@ const ChatRoom = () => {
     });
   };
 
-  // 유저 선택 상태 변경하기
+  // 유저 선택 상태 변경하기, 모집 글 상태 변경하기
   const handleUpdateParticipants = () => {
     // posts 경로에서 해당 포스트 데이터 가져오기
     const postRef = ref(database, `posts/${id}`);
+
     onValue(postRef, (snapshot) => {
       if (snapshot.exists()) {
         const postData = snapshot.val();
         const applicants = postData.applicants;
+        const status = postData.status;
 
         const updates = {};
+
+        updates[`posts/${id}/status`] = "모집 완료";
+
         for (let applicantId in applicants) {
           if (applicants[applicantId].nickname === chatRoomInfo.applicantUid) {
             updates[`posts/${id}/applicants/${applicantId}/status`] =

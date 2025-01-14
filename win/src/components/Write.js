@@ -67,6 +67,7 @@ function Write() {
       createdDate,
       yourTeam: yourTeam,
       authorNickname: nickname,
+      status: "모집 중",
     };
 
     console.log("newPost:", newPost); // 값이 제대로 설정되는지 확인
