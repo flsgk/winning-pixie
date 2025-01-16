@@ -37,7 +37,7 @@
 
 /* Tody Cell에 배경색 주기 */
 .fc .fc-daygrid-day.fc-day-today {
-  background-color: #f5ff8bbb;
+  background-color: #d8d8d8;
 }
 /* 날짜 Cell 프레임 */
 .fc .fc-daygrid-day-frame {
@@ -62,6 +62,7 @@
   border-radius: 10px;
   font-weight: 500;
   font-size: 14px;
+  text-align: center;
 }
 
 /* .fc-event :hover {

@@ -21,6 +21,7 @@ function Logout({ onLogout }) {
       variant="soft"
       sx={{
         borderRadius: 10,
+        width: "100px",
       }}
       onClick={handleLogout}
     >

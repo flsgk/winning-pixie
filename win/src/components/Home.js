@@ -16,6 +16,7 @@ import Box from "@mui/joy/Box";
 import Chip from "@mui/joy/Chip";
 import Divider from "@mui/joy/Divider";
 import Stack from "@mui/joy/Stack";
+import EditRoundedIcon from "@mui/icons-material/EditRounded";
 
 function Home({ isLoggedIn, posts }) {
   const [selectedDate, setSelectedDate] = useState(null); // 선택된 날짜
@@ -166,7 +167,7 @@ function Home({ isLoggedIn, posts }) {
                 <Button
                   color="neutral"
                   variant="soft"
-                  sx={{ borderRadius: 10 }}
+                  sx={{ borderRadius: 10, width: "100px" }}
                 >
                   MY
                 </Button>
@@ -187,135 +188,184 @@ function Home({ isLoggedIn, posts }) {
 
               {selectedDate ? (
                 <Grid item xs={12} sm={4} sx={{ paddingX: 4 }}>
-                  <Box>
-                    <h5>
-                      {new Date(selectedDate).toLocaleDateString("ko-KR", {
-                        month: "long",
-                        day: "numeric",
-                      })}
-                      의 승리요정을 찾고 있어요!
-                    </h5>
-                    <div className="write-button-container">
-                      <Link
-                        to={`/write?date=${selectedDate}&teams=${selectedTeams.join(
-                          ","
-                        )}`}
-                      >
-                        <Button startDecorator={<Add />}>글쓰기</Button>
-                      </Link>
-                    </div>
-                    {/* 글 목록 및 필터 버튼 */}
-                    <div className="team-filter-buttons">
-                      <ButtonGroup
-                        spacing="0.5rem"
-                        aria-label="spacing button group"
-                        sx={{
-                          marginBottom: 1,
-                          marginTop: 1,
-                        }}
-                      >
-                        {selectedTeams.map((team, index) => (
-                          <Button
-                            key={index}
-                            onClick={() => handleTeamFilter(team)}
-                            className={
-                              selectedTeamFilter === team ? "active" : ""
-                            }
-                          >
-                            {team}
-                          </Button>
-                        ))}
-                        <Button
-                          onClick={() => handleTeamFilter("기타")}
-                          className={
-                            selectedTeamFilter === "기타" ? "active" : ""
-                          }
-                        >
-                          기타
-                        </Button>
-                      </ButtonGroup>
-                    </div>
-                    <Divider orientation="horizontal" />
-                    {filteredPosts.length > 0 ? (
+                  <Box
+                    sx={{
+                      marginTop: "90px",
+                      backgroundColor: "#f7f7f7",
+                      borderRadius: "20px",
+                      height: "600px",
+                    }}
+                  >
+                    <Box
+                      sx={{
+                        padding: "10px",
+                      }}
+                    >
+                      <Typography level="h4">
+                        {new Date(selectedDate).toLocaleDateString("ko-KR", {
+                          month: "long",
+                          day: "numeric",
+                        })}
+                        의 승리요정을 찾고 있어요!
+                      </Typography>
+
+                      {/* 글 목록 및 필터 버튼 */}
                       <Box
                         sx={{
                           display: "flex",
-                          flexDirection: "column",
+                          justifyContent: "space-between",
                           alignItems: "center",
-                          maxHeight: 500, // 최대 높이 설정 (필요에 맞게 조정)
-                          overflowY: "auto", // 세로 스크롤 활성화
-                          paddingX: 1, // 부모 컨테이너 내부 여백 추가
+                          marginTop: 1,
                         }}
                       >
-                        {displayedPosts.map(
-                          (post) =>
-                            post.status === "모집 중" && (
-                              <Card
-                                key={post.id}
-                                className="post-card"
-                                variant="outlined"
-                                sx={{
-                                  width: "90%", // 기본적으로 90% 너비를 차지
-                                  marginBottom: 1,
-                                  marginTop: 1,
-
-                                  "@media (max-width: 800px)": {
-                                    width: "100%", // 화면 너비가 600px 이하일 때는 100%로 설정
-                                  },
-                                }}
-                              >
-                                <CardContent>
-                                  <Box
-                                    className="post-header"
-                                    sx={{
-                                      display: "flex",
-                                      justifyContent: "space-between",
-                                      alignItems: "center",
-                                    }}
-                                  >
-                                    <Typography level="title-lg">
-                                      {post.title}
-                                    </Typography>
-
-                                    <Chip
-                                      color={
-                                        post.status === "모집 중"
-                                          ? "success"
-                                          : "neutral"
-                                      }
-                                    >
-                                      {post.status}
-                                    </Chip>
-                                  </Box>
-                                  <Chip size="md" variant="soft">
-                                    {post.yourTeam}
-                                  </Chip>
-                                  <div
-                                    dangerouslySetInnerHTML={{
-                                      __html: post.content,
-                                    }}
-                                  ></div>
-
-                                  <Typography
-                                    level="body-sm"
-                                    className="post-date"
-                                  >
-                                    작성일:{post.createdDate}
-                                  </Typography>
-                                  <Link
-                                    to={`/post/${post.id}`}
-                                    style={{ textDecoration: "none" }}
-                                  >
-                                    <Button>자세히 보기</Button>
-                                  </Link>
-                                </CardContent>
-                              </Card>
-                            )
-                        )}
+                        <Link
+                          to={`/write?date=${selectedDate}&teams=${selectedTeams.join(
+                            ","
+                          )}`}
+                        >
+                          <Button
+                            startDecorator={<Add />}
+                            color="neutral"
+                            variant="solid"
+                            sx={{
+                              borderRadius: "20px",
+                            }}
+                          >
+                            글쓰기
+                          </Button>
+                        </Link>
+                        <ButtonGroup
+                          spacing="0.5rem"
+                          aria-label="spacing button group"
+                          sx={{
+                            marginBottom: 1,
+                            marginTop: 1,
+                            borderRadius: "20px",
+                          }}
+                        >
+                          {selectedTeams.map((team, index) => (
+                            <Button
+                              key={index}
+                              onClick={() => handleTeamFilter(team)}
+                              className={
+                                selectedTeamFilter === team ? "active" : ""
+                              }
+                            >
+                              {team}
+                            </Button>
+                          ))}
+                          <Button
+                            onClick={() => handleTeamFilter("기타")}
+                            className={
+                              selectedTeamFilter === "기타" ? "active" : ""
+                            }
+                            sx={{
+                              borderRadius: "20px",
+                            }}
+                          >
+                            기타
+                          </Button>
+                        </ButtonGroup>
                       </Box>
-                    ) : (
-                      <Box sx={{ padding: 2 }}>작성된 글이 없습니다.</Box>
-                    )}
+                      <Divider orientation="horizontal" />
+
+                      {filteredPosts.length > 0 ? (
+                        <Box
+                          sx={{
+                            display: "flex",
+                            flexDirection: "column",
+                            justifyContent: "center",
+                            maxHeight: 500, // 최대 높이 설정 (필요에 맞게 조정)
+                            overflowY: "auto", // 세로 스크롤 활성화
+                            paddingX: 1, // 부모 컨테이너 내부 여백 추가
+                            padding: "5px",
+                          }}
+                        >
+                          {displayedPosts.map(
+                            (post) =>
+                              post.status === "모집 중" && (
+                                <Link
+                                  to={`/post/${post.id}`}
+                                  style={{ textDecoration: "none" }}
+                                >
+                                  <Card
+                                    key={post.id}
+                                    className="post-card"
+                                    variant="outlined"
+                                    sx={{
+                                      width: "350px",
+                                      maxWidth: "100%", // 화면 너비에 따라 너무 커지지 않도록 제한
+                                      margin: "auto", // 가로 정렬을 중앙으로
+                                      marginBottom: 1,
+                                      marginTop: 1,
+                                      boxShadow: "sm",
+
+                                      "@media (max-width: 480px)": {
+                                        width: "200px", // 화면 너비가 600px 이하일 때는 100%로 설정
+                                      },
+                                    }}
+                                  >
+                                    <CardContent>
+                                      <Box
+                                        className="post-header"
+                                        sx={{
+                                          display: "flex",
+                                          justifyContent: "space-between",
+                                          alignItems: "center",
+                                        }}
+                                      >
+                                        <Box>
+                                          <Typography level="title-lg">
+                                            {post.title}
+                                          </Typography>
+                                        </Box>
+
+                                        <Box>
+                                          <Chip
+                                            color={
+                                              post.status === "모집 중"
+                                                ? "success"
+                                                : "neutral"
+                                            }
+                                            sx={{
+                                              mr: 0.5,
+                                            }}
+                                          >
+                                            {post.status}
+                                          </Chip>
+                                          <Chip size="md" variant="soft">
+                                            {post.yourTeam}
+                                          </Chip>
+                                        </Box>
+                                      </Box>
+
+                                      <Typography
+                                        level="body-sm"
+                                        className="post-date"
+                                        sx={{
+                                          display: "flex",
+                                          alignItems: "center",
+                                          gap: "4px",
+                                        }}
+                                      >
+                                        <EditRoundedIcon
+                                          sx={{
+                                            fontSize: "1rem",
+                                            marginRight: "4px",
+                                          }}
+                                        />
+                                        {post.createdDate}
+                                      </Typography>
+                                    </CardContent>
+                                  </Card>
+                                </Link>
+                              )
+                          )}
+                        </Box>
+                      ) : (
+                        <Box sx={{ padding: 2 }}>작성된 글이 없습니다.</Box>
+                      )}
+                    </Box>
                   </Box>
                 </Grid>
               ) : (

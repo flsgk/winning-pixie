@@ -23,8 +23,12 @@ import {
   Stack,
   Textarea,
   Chip,
+  Divider,
 } from "@mui/joy";
 import GoBackButton from "./GoBackButton";
+import CalendarMonthRoundedIcon from "@mui/icons-material/CalendarMonthRounded";
+import AccountCircleRoundedIcon from "@mui/icons-material/AccountCircleRounded";
+import FavoriteRoundedIcon from "@mui/icons-material/FavoriteRounded";
 
 function PostDetail() {
   const { id } = useParams();
@@ -271,30 +275,68 @@ function PostDetail() {
         <Box
           sx={{
             display: "flex",
-            justifyContent: "space-between",
             alignItems: "center",
           }}
         >
-          <Typography level="h2">{post.title}</Typography>
-          <Chip color={post.status === "모집 중" ? "success" : "neutral"}>
+          <Chip
+            color={post.status === "모집 중" ? "success" : "neutral"}
+            sx={{
+              mr: "5px",
+            }}
+          >
             {post.status}
           </Chip>
+          <Chip>{post.yourTeam}</Chip>
         </Box>
-        <Typography level="body-xs">{post.authorNickname}님</Typography>
-        <Typography level="body-xs">작성일: {post.createdDate}</Typography>
-        <div dangerouslySetInnerHTML={{ __html: post.content }} />
-        <Typography level="body-sm">
-          경기일:{" "}
+        <Typography level="h2">{post.title}</Typography>
+
+        <Typography
+          level="body-xs"
+          sx={{
+            display: "flex", // 아이콘과 글씨를 한 줄로 정렬
+            alignItems: "center", // 글씨를 세로로 맞춰서 정렬
+            gap: "4px",
+          }} // 아이콘과 글씨 사이에 간격 주기
+        >
+          <CalendarMonthRoundedIcon
+            sx={{ fontSize: "1rem", marginRight: "4px" }}
+          />
           {new Date(post.playDate).toLocaleDateString("ko-KR", {
             year: "numeric",
             month: "long",
             day: "numeric",
           })}
         </Typography>
-        <Typography level="body-sm">
-          {post.yourTeam} 팀의 승리요정을 찾고 있어요!
+
+        <Typography
+          level="body-xs"
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            gap: "4px",
+          }}
+        >
+          <AccountCircleRoundedIcon
+            sx={{ fontSize: "1rem", marginRight: "4px" }}
+          />
+          {post.authorNickname}님
         </Typography>
 
+        <Typography
+          level="body-xs"
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            gap: "4px",
+          }}
+        >
+          <FavoriteRoundedIcon sx={{ fontSize: "1rem", marginRight: "4px" }} />{" "}
+          {post.yourTeam} 팀의 승리요정을 찾고 있어요!
+        </Typography>
+        <Divider />
+        <div dangerouslySetInnerHTML={{ __html: post.content }} />
+
+        <Divider />
         {isAuthor ? (
           <Button onClick={() => navigate(`/edit/${id}`)}>편집하기</Button>
         ) : (
