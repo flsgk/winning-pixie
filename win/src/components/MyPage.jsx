@@ -4,6 +4,7 @@ import { Box } from "@mui/joy";
 import Sidebar from "./Sidebar";
 import MyProfile from "./MyProfile";
 import WinningRate from "./WinningRate";
+import ChatList from "./ChatList";
 
 function MyPage({ nickname, selectedTeam }) {
   const sidebarWidth = 250; // 사이드바의 고정 너비
@@ -17,6 +18,8 @@ function MyPage({ nickname, selectedTeam }) {
         return <WinningRate selectedTeam={selectedTeam} />;
       case "profile":
         return <MyProfile selectedTeam={selectedTeam} />;
+      case "chat-list":
+        return <ChatList />;
 
       default:
         return <MyProfile selectedTeam={selectedTeam} />;

@@ -8,6 +8,8 @@ import {
   Typography,
   CardOverflow,
   ButtonGroup,
+  Stack,
+  Divider,
 } from "@mui/joy";
 
 import { getAuth, onAuthStateChanged } from "firebase/auth";
@@ -87,16 +89,37 @@ function WinningRate({ selectedTeam, date }) {
   };
 
   return (
-    <div>
-      <Button onClick={() => navigate("/record")}>직관 기록하기</Button>
-      <h2>승률 계산</h2>
-      <p>{`🏆 ${selectedYear}: ${winningRate.toFixed(2)}%`}</p>
+    <Stack>
+      <Typography level="h2" component="h1" sx={{ mt: 1, mb: 2 }}>
+        나의 직관기록
+      </Typography>
+      <Divider />
+      <Button
+        onClick={() => navigate("/record")}
+        sx={{
+          mt: 4,
+          width: "150px",
+        }}
+      >
+        직관 기록하기
+      </Button>
+
+      <Typography
+        level="h5"
+        fontWeight="bold"
+        sx={{
+          marginTop: 2,
+        }}
+      >{`🏆 ${selectedYear}: ${winningRate.toFixed(2)}%`}</Typography>
 
       <ButtonGroup spacing="3px">
         <Button
           onClick={() => handleYearChange(2024)}
           color="neutral"
           variant={selectedYear === 2024 ? "solid" : "outlined"}
+          sx={{
+            borderRadius: "20px",
+          }}
         >
           24 시즌
         </Button>
@@ -104,6 +127,9 @@ function WinningRate({ selectedTeam, date }) {
           onClick={() => handleYearChange(2025)}
           color="neutral"
           variant={selectedYear === 2025 ? "solid" : "outlined"}
+          sx={{
+            borderRadius: "20px",
+          }}
         >
           25 시즌
         </Button>
@@ -162,7 +188,7 @@ function WinningRate({ selectedTeam, date }) {
           </Card>
         ))}
       </Box>
-    </div>
+    </Stack>
   );
 }
 

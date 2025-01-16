@@ -237,7 +237,7 @@ const Record = ({ selectedTeam }) => {
   return (
     <Stack>
       <Typography level="h2" component="h1" sx={{ mt: 1, mb: 2 }}>
-        내 직관기록
+        직관 기록하기
       </Typography>
 
       <Divider />
