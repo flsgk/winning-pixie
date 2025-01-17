@@ -29,6 +29,7 @@ import GoBackButton from "./GoBackButton";
 import CalendarMonthRoundedIcon from "@mui/icons-material/CalendarMonthRounded";
 import AccountCircleRoundedIcon from "@mui/icons-material/AccountCircleRounded";
 import FavoriteRoundedIcon from "@mui/icons-material/FavoriteRounded";
+import PeopleRoundedIcon from "@mui/icons-material/PeopleRounded";
 
 function PostDetail() {
   const { id } = useParams();
@@ -267,6 +268,9 @@ function PostDetail() {
   if (!post) return <p>글을 찾을 수 없습니다.</p>;
 
   const isAuthor = post?.uid === auth.currentUser?.uid;
+  // const applicantCount = post.applicants
+  //   ? Object.keys(post.applicants).length
+  //   : 0;
 
   return (
     <Box>
@@ -320,6 +324,18 @@ function PostDetail() {
             sx={{ fontSize: "1rem", marginRight: "4px" }}
           />
           {post.authorNickname}님
+        </Typography>
+
+        <Typography
+          level="body-xs"
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            gap: "4px",
+          }}
+        >
+          <PeopleRoundedIcon sx={{ fontSize: "1rem", marginRight: "4px" }} />
+          참여 중인 인원 /{post.capacity}
         </Typography>
 
         <Typography

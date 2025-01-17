@@ -36,6 +36,7 @@ function Write() {
   const [yourTeam, setYourTeam] = useState(""); // '선택'으로 초기화
   const [myTeam, setMyTeam] = useState("");
   const [nickname, setNickname] = useState(""); // 현재 사용자의 닉네임 상태 추가
+  const [capacity, setCapacity] = useState("");
 
   useEffect(() => {
     // 현재 사용자 정보 가져오기 (닉네임)
@@ -68,6 +69,7 @@ function Write() {
       yourTeam: yourTeam,
       authorNickname: nickname,
       status: "모집 중",
+      capacity,
     };
 
     console.log("newPost:", newPost); // 값이 제대로 설정되는지 확인
@@ -114,11 +116,6 @@ function Write() {
         </Stack>
 
         <Stack spacing={1}>
-          <FormLabel>내용</FormLabel>
-          <ReactEditor value={content} onChange={setContent} />
-        </Stack>
-
-        <Stack spacing={1}>
           <FormLabel>경기 날짜</FormLabel>
           <Input
             type="date"
@@ -130,38 +127,65 @@ function Write() {
         </Stack>
 
         <Stack spacing={1}>
-          <FormLabel>어떤 팀을 웅원하나요?</FormLabel>
-          <Select
-            name="myTeam"
-            value={myTeam} // 초기값 설정
-            onChange={(event, value) => setMyTeam(value)}
-            startDecorator={<FavoriteBorder />}
-            sx={{ width: 300 }}
-            placeholder="선택"
-          >
-            <Option value={initialTeams[0]}>{initialTeams[0]}</Option>
-            {/* 첫 번째 팀 */}
-            <Option value={initialTeams[1]}>{initialTeams[1]}</Option>
-            {/* 두 번째 팀 */}
-            <Option value="기타">기타</Option> {/* 기타 옵션 */}
-          </Select>
+          <FormLabel>내용</FormLabel>
+          <ReactEditor value={content} onChange={setContent} />
         </Stack>
 
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "row",
+            gap: 1,
+          }}
+        >
+          <Stack spacing={1}>
+            <FormLabel>어떤 팀을 응원하나요?</FormLabel>
+            <Select
+              name="myTeam"
+              value={myTeam} // 초기값 설정
+              onChange={(event, value) => setMyTeam(value)}
+              startDecorator={<FavoriteBorder />}
+              sx={{ width: 300 }}
+              placeholder="선택"
+            >
+              <Option value={initialTeams[0]}>{initialTeams[0]}</Option>
+              {/* 첫 번째 팀 */}
+              <Option value={initialTeams[1]}>{initialTeams[1]}</Option>
+              {/* 두 번째 팀 */}
+              <Option value="기타">기타</Option> {/* 기타 옵션 */}
+            </Select>
+          </Stack>
+
+          <Stack spacing={1}>
+            <FormLabel>어떤 팀의 요정과 함께 하고 싶나요?</FormLabel>
+            <Select
+              name="yourTeam"
+              value={yourTeam} // 초기값 설정
+              onChange={(event, value) => setYourTeam(value)}
+              startDecorator={<FavoriteBorder />}
+              sx={{ width: 300 }}
+              placeholder="선택"
+            >
+              <Option value={initialTeams[0]}>{initialTeams[0]}</Option>
+              {/* 첫 번째 팀 */}
+              <Option value={initialTeams[1]}>{initialTeams[1]}</Option>
+              {/* 두 번째 팀 */}
+              <Option value="기타">기타</Option> {/* 기타 옵션 */}
+            </Select>
+          </Stack>
+        </Box>
         <Stack spacing={1}>
-          <FormLabel>어떤 팀의 요정과 함께 하고 싶나요?</FormLabel>
+          <FormLabel>몇 명과 함께하고 싶나요?</FormLabel>
           <Select
-            name="yourTeam"
-            value={yourTeam} // 초기값 설정
-            onChange={(event, value) => setYourTeam(value)}
-            startDecorator={<FavoriteBorder />}
-            sx={{ width: 300 }}
+            value={capacity}
+            onChange={(event, value) => setCapacity(value)}
+            sx={{ width: 150 }}
             placeholder="선택"
           >
-            <Option value={initialTeams[0]}>{initialTeams[0]}</Option>
-            {/* 첫 번째 팀 */}
-            <Option value={initialTeams[1]}>{initialTeams[1]}</Option>
-            {/* 두 번째 팀 */}
-            <Option value="기타">기타</Option> {/* 기타 옵션 */}
+            <Option value={1}>1</Option>
+            <Option value={2}>2</Option>
+            <Option value={3}>3</Option>
+            <Option value={4}>4</Option>
           </Select>
         </Stack>
 

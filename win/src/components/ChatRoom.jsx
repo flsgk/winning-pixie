@@ -97,6 +97,7 @@ const ChatRoom = () => {
   // 메시지 전송
   const sendMessage = () => {
     if (input) {
+      console.log(input);
       const user = auth.currentUser;
 
       if (user) {
@@ -156,7 +157,7 @@ const ChatRoom = () => {
 
   // 채팅 메시지 시간 표시
   const formatTimestamp = (timestamp) => {
-    if (!timestamp) return " ";
+    if (!timestamp || typeof timestamp !== "number") return " ";
     const date = new Date(timestamp);
     return date.toLocaleTimeString("ko-KR", {
       hour: "2-digit",
@@ -202,8 +203,22 @@ const ChatRoom = () => {
     });
   };
 
+  useEffect(() => {
+    const chatContainer = document.querySelector(".chat-container");
+    if (chatContainer) {
+      chatContainer.scrollTop = chatContainer.scrollHeight;
+    }
+  }, [messages]);
+
   return (
-    <Box sx={{ maxWidth: "60%", minWidth: "auto" }}>
+    <Box
+      sx={{
+        maxWidth: "60%",
+        minWidth: "auto",
+        height: "100vh",
+        overflow: "hidden",
+      }}
+    >
       <GoBackButton />
       {gameInfo ? (
         <>
@@ -233,67 +248,78 @@ const ChatRoom = () => {
 
       <Divider />
 
-      {messages.map((messageData, index) => (
-        <Box
-          sx={{
-            marginBottom: 1, // 각 메시지 간의 세로 간격을 줄이기 위해 marginBottom을 추가
-          }}
-        >
+      <Box
+        className="chat-container"
+        sx={{
+          maxHeight: "60vh", // 스크롤 높이 제한
+          overflowY: "auto", // 스크롤 가능
+          padding: 1,
+          backgroundColor: "var(--joy-palette-neutral-50, #F9FAFB)", // 배경색
+          borderRadius: "md", // 모서리 둥글게
+        }}
+      >
+        {messages.map((messageData, index) => (
           <Box
             sx={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems:
-                messageData.sender === currentUserId
-                  ? "flex-end"
-                  : "flex-start",
+              marginBottom: 1, // 각 메시지 간의 세로 간격을 줄이기 위해 marginBottom을 추가
             }}
-            key={index}
           >
-            <Typography>
-              {messageData.sender === currentUserId
-                ? "나"
-                : messageData.senderNickname + "님"}
-            </Typography>
-            <Sheet
+            <Box
               sx={{
-                p: 1.25,
-                borderRadius: "lg",
-                fontSize: "sm",
-
-                textAlign:
-                  messageData.sender === currentUserId ? "right" : "left",
-                borderTopRightRadius:
-                  messageData.sender === currentUserId ? 0 : "lg",
-                borderTopLeftRadius:
-                  messageData.sender === currentUserId ? "lg" : 0,
-                backgroundColor:
+                display: "flex",
+                flexDirection: "column",
+                alignItems:
                   messageData.sender === currentUserId
-                    ? "var(--joy-palette-primary-solidBg)"
-                    : "var(--joy-palette-neutral-100, #F0F4F8)",
-                display: "inline-block", // 부모 요소의 크기가 자식의 콘텐츠에 맞춰 조정됨
-                wordBreak: "break-word", // 긴 단어가 넘칠 경우 줄 바꿈
-                maxWidth: "60%", // 메시지 길이에 맞게 최대 너비를 설정 (여기서는 70%로 설정, 필요에 따라 조정)
+                    ? "flex-end"
+                    : "flex-start",
               }}
+              key={index}
             >
-              <Typography
-                level="body-sm"
+              <Typography>
+                {messageData.sender === currentUserId
+                  ? "나"
+                  : messageData.senderNickname + "님"}
+              </Typography>
+              <Sheet
                 sx={{
-                  color:
+                  p: 1.25,
+                  borderRadius: "lg",
+                  fontSize: "sm",
+
+                  textAlign:
+                    messageData.sender === currentUserId ? "right" : "left",
+                  borderTopRightRadius:
+                    messageData.sender === currentUserId ? 0 : "lg",
+                  borderTopLeftRadius:
+                    messageData.sender === currentUserId ? "lg" : 0,
+                  backgroundColor:
                     messageData.sender === currentUserId
-                      ? "var(--joy-palette-common-white)"
-                      : "var(--joy-palette-text-primary)",
+                      ? "var(--joy-palette-primary-solidBg)"
+                      : "var(--joy-palette-neutral-100, #F0F4F8)",
+                  display: "inline-block", // 부모 요소의 크기가 자식의 콘텐츠에 맞춰 조정됨
+                  wordBreak: "break-word", // 긴 단어가 넘칠 경우 줄 바꿈
+                  maxWidth: "60%", // 메시지 길이에 맞게 최대 너비를 설정 (여기서는 70%로 설정, 필요에 따라 조정)
                 }}
               >
-                {messageData.text}
+                <Typography
+                  level="body-sm"
+                  sx={{
+                    color:
+                      messageData.sender === currentUserId
+                        ? "var(--joy-palette-common-white)"
+                        : "var(--joy-palette-text-primary)",
+                  }}
+                >
+                  {messageData.text}
+                </Typography>
+              </Sheet>
+              <Typography level="body-xs">
+                {formatTimestamp(messageData.timestamp)}
               </Typography>
-            </Sheet>
-            <Typography level="body-xs">
-              {formatTimestamp(messageData.timestamp)}
-            </Typography>
+            </Box>
           </Box>
-        </Box>
-      ))}
+        ))}{" "}
+      </Box>
 
       <Box>
         <form onSubmit={handleSubmit}>

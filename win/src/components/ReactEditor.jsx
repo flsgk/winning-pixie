@@ -23,7 +23,7 @@ const ReactEditor = ({ value, onChange, modules }) => {
         theme="snow"
         modules={modules || defaultModules}
         placeholder="내용을 입력하세요...."
-        style={{ width: 700, height: 300 }}
+        style={{ width: 700, height: 200 }}
       />
     </>
   );
