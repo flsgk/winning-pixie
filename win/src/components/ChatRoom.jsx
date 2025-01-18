@@ -107,7 +107,7 @@ const ChatRoom = () => {
         const senderNickname =
           currentUserId === chatRoomInfo.authorUid
             ? chatRoomInfo.authorNickname
-            : chatRoomInfo.applicantUid;
+            : chatRoomInfo.applicantNickname;
 
         const messageData = {
           roomId,
@@ -177,16 +177,13 @@ const ChatRoom = () => {
 
         const updates = {};
 
-        // updates[`posts/${id}/status`] = "모집 완료";
-
         for (let applicantId in applicants) {
-          if (applicants[applicantId].nickname === chatRoomInfo.applicantUid) {
+          if (
+            applicants[applicantId].nickname === chatRoomInfo.applicantNickname
+          ) {
             updates[`posts/${id}/applicants/${applicantId}/status`] =
               "accepted"; // 선택된 참가자의 상태는 accepted로 설정
           }
-          // else {
-          //   updates[`posts/${id}/applicants/${applicantId}/status`] = "pending"; // 나머지 참가자들의 상태는 종료로 설정
-          // }
         }
 
         // Firebase에서 상태 업데이트

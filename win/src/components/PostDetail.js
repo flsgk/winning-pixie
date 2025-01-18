@@ -247,7 +247,8 @@ function PostDetail() {
         const newChatRoom = {
           roomId: newRoomKey,
           authorUid: auth.currentUser?.uid,
-          applicantUid: applicant.nickname,
+          applicantUid: applicant.uid,
+          applicantNickname: applicant.nickname,
           authorNickname: post.authorNickname,
           postId: id,
           messages: [],
@@ -283,7 +284,7 @@ function PostDetail() {
 
         onValue(postRef, (snapshot) => {
           const postData = snapshot.val();
-          setPost(postData); // 버튼을 누름에 따라 게시글의 status가 변경될 경우 UI에 반영
+          setPost(postData); // 버튼을 누름에 따라 게시글 UI에 반영
         });
       }
     } catch (error) {
@@ -301,14 +302,16 @@ function PostDetail() {
 
   let acceptedCount = 0; // 변수 선언 및 초기값 0으로 설정
 
-  const acceptedStatusCount = Object.values(post.applicants).forEach(
-    // Object.values : 객체의 모든 값을 배열로 변환
-    (applicant) => {
-      if (applicant.status === "accepted") {
-        acceptedCount++;
+  if (post.applicants) {
+    const acceptedStatusCount = Object.values(post.applicants).forEach(
+      // Object.values : 객체의 모든 값을 배열로 변환
+      (applicant) => {
+        if (applicant.status === "accepted") {
+          acceptedCount++;
+        }
       }
-    }
-  );
+    );
+  }
 
   const newStatus = acceptedCount === post.capacity ? "모집 완료" : "모집 중";
   const postRef = ref(database, `posts/${id}`);
