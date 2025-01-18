@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ref, get, update, onValue, set } from "firebase/database";
+import { ref, get, update, onValue, set, getDatabase } from "firebase/database";
 import { database } from "../firebase";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import {
@@ -55,6 +55,7 @@ function PostDetail() {
   const [applicants, setApplicants] = useState([]); // 해당 게시물에 참가 신청한 사람들의 정보
   const [isApplicant, setIsApplicant] = useState(false); // 사용자가 이미 참가 신청을 했는지
   const [isEdit, setIsEdit] = useState(false);
+  const [postStatus, setPostStatus] = useState("");
 
   // 사용자 정보 가져오기 : 유저가 로그인한 상태에서 유저 닉네임을 가져와서 formData에 업데이트하기
   useEffect(() => {
@@ -83,6 +84,7 @@ function PostDetail() {
         const applicantsList = postData.applicants
           ? Object.values(postData.applicants)
           : []; // 신청자 목록을 가져와서
+        console.log("신청자 정보: ", applicants);
         setApplicants(applicantsList); // 신청자 목록 상태를 업데이트 한다
 
         // 이미 사용자가 신청했는지 여부를 업데이트
@@ -231,6 +233,7 @@ function PostDetail() {
 
   // 채팅방 처리
   const handleChat = async (applicant, index) => {
+    console.log("Index1: ", index);
     try {
       const postRef = ref(database, `posts/${id}`);
       const applicantRoomId = applicant.roomId; // 신청자의 채팅방 ID
@@ -263,14 +266,60 @@ function PostDetail() {
       console.error("Error creating chat room:", error);
     }
   };
+  const handleStatus = async (applicant, index) => {
+    console.log("Index2: ", index);
+    try {
+      const postRef = ref(database, `posts/${id}`);
+      const applicantStatus = applicant.status;
+
+      // applicantStatus가 "accepted" 또는 "pending" 값만을 가지는지 확인
+      if (applicantStatus === "accepted" || applicantStatus === "pending") {
+        const newStatus =
+          applicantStatus === "accepted" ? "pending" : "accepted";
+        await update(postRef, {
+          [`applicants/${Object.keys(post.applicants)[index]}/status`]:
+            newStatus,
+        });
+
+        onValue(postRef, (snapshot) => {
+          const postData = snapshot.val();
+          setPost(postData); // 버튼을 누름에 따라 게시글의 status가 변경될 경우 UI에 반영
+        });
+      }
+    } catch (error) {
+      console.error("Error changing status:", error);
+    }
+  };
 
   if (loading) return <p>로딩 중...</p>;
   if (!post) return <p>글을 찾을 수 없습니다.</p>;
 
   const isAuthor = post?.uid === auth.currentUser?.uid;
-  // const applicantCount = post.applicants
-  //   ? Object.keys(post.applicants).length
-  //   : 0;
+  const applicantCount = post.applicants
+    ? Object.keys(post.applicants).length
+    : 0;
+
+  let acceptedCount = 0; // 변수 선언 및 초기값 0으로 설정
+
+  const acceptedStatusCount = Object.values(post.applicants).forEach(
+    // Object.values : 객체의 모든 값을 배열로 변환
+    (applicant) => {
+      if (applicant.status === "accepted") {
+        acceptedCount++;
+      }
+    }
+  );
+
+  const newStatus = acceptedCount === post.capacity ? "모집 완료" : "모집 중";
+  const postRef = ref(database, `posts/${id}`);
+
+  const updatedPost = {
+    ...post,
+    status: newStatus, // 상태를 '모집 완료'로 변경
+  };
+  update(postRef, updatedPost);
+
+  console.log("accepted count:", acceptedCount); // 'accepted' 상태인 applicants의 개수 출력
 
   return (
     <Box>
@@ -335,7 +384,7 @@ function PostDetail() {
           }}
         >
           <PeopleRoundedIcon sx={{ fontSize: "1rem", marginRight: "4px" }} />
-          참여 중인 인원 /{post.capacity}
+          참여 중인 인원 {applicantCount}/{post.capacity}
         </Typography>
 
         <Typography
@@ -414,6 +463,7 @@ function PostDetail() {
                     onChange={(e, newValue) =>
                       setFormData({ ...formData, team: newValue })
                     }
+                    placeholder="선택"
                   >
                     <Option value="두산">두산</Option>
                     <Option value="LG">LG</Option>
@@ -508,7 +558,7 @@ function PostDetail() {
       {post.applicants && (
         <Box sx={{ marginTop: 2 }}>
           <Typography level="h3">참여하고 싶어요!</Typography>
-          <Stack spacing={2} sx={{ width: 200 }}>
+          <Stack spacing={2} sx={{ width: 300 }}>
             {applicants.map((applicant, index) => (
               <Card key={index} className="applicant-card">
                 <Box
@@ -531,31 +581,59 @@ function PostDetail() {
                 >
                   {applicant.status}
                 </Chip>
-                {!isAuthor && applicant.nickname === formData.nickname && (
-                  <Button
-                    disabled={applicant.status === "종료"}
-                    onClick={() => setIsEdit(true)}
-                  >
-                    수정하기
-                  </Button>
-                )}
-                {isAuthor ? (
-                  <Button onClick={() => handleChat(applicant, index)}>
-                    {applicant.roomId ? "채팅 이동하기" : "채팅하기"}
-                  </Button>
-                ) : (
-                  applicant.nickname === formData.nickname &&
-                  applicant.roomId && (
+                <Box sx={{ display: "flex", flexDirection: "row", gap: 2 }}>
+                  {isAuthor && (
+                    <Button
+                      onClick={() => handleStatus(applicant, index)}
+                      sx={{
+                        width: "80px",
+                        fontSize: "10px",
+                      }}
+                    >
+                      {applicant.status === "accepted" ? "수락 취소" : "수락"}
+                    </Button>
+                  )}
+                  {!isAuthor && applicant.nickname === formData.nickname && (
                     <Button
                       disabled={applicant.status === "종료"}
-                      onClick={() => handleChat(applicant, index)}
+                      onClick={() => setIsEdit(true)}
+                      sx={{
+                        width: "80px",
+                        fontSize: "10px",
+                      }}
                     >
-                      {applicant.status !== "종료"
-                        ? "채팅 이동하기"
-                        : "다음에 만나요"}
+                      수정하기
                     </Button>
-                  )
-                )}
+                  )}
+
+                  {isAuthor ? (
+                    <Button
+                      onClick={() => handleChat(applicant, index)}
+                      sx={{
+                        width: "100px",
+                        fontSize: "10px",
+                      }}
+                    >
+                      {applicant.roomId ? "채팅 이동하기" : "채팅하기"}
+                    </Button>
+                  ) : (
+                    applicant.nickname === formData.nickname &&
+                    applicant.roomId && (
+                      <Button
+                        disabled={applicant.status === "종료"}
+                        onClick={() => handleChat(applicant, index)}
+                        sx={{
+                          width: "100px",
+                          fontSize: "10px",
+                        }}
+                      >
+                        {applicant.status !== "종료"
+                          ? "채팅 이동하기"
+                          : "다음에 만나요"}
+                      </Button>
+                    )
+                  )}
+                </Box>
               </Card>
             ))}
           </Stack>

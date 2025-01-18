@@ -30,7 +30,6 @@ const socket = io("http://localhost:4000"); // 서버와 웹소켓 통신 설정
 
 const ChatRoom = () => {
   const { roomId } = useParams();
-  console.log(roomId); // roomId 값 확인
   const { id } = useParams(); // URL에서 ID 가져오기
 
   const [messages, setMessages] = useState([]); // 채팅 메시지 저장
@@ -178,15 +177,16 @@ const ChatRoom = () => {
 
         const updates = {};
 
-        updates[`posts/${id}/status`] = "모집 완료";
+        // updates[`posts/${id}/status`] = "모집 완료";
 
         for (let applicantId in applicants) {
           if (applicants[applicantId].nickname === chatRoomInfo.applicantUid) {
             updates[`posts/${id}/applicants/${applicantId}/status`] =
               "accepted"; // 선택된 참가자의 상태는 accepted로 설정
-          } else {
-            updates[`posts/${id}/applicants/${applicantId}/status`] = "종료"; // 나머지 참가자들의 상태는 종료로 설정
           }
+          // else {
+          //   updates[`posts/${id}/applicants/${applicantId}/status`] = "pending"; // 나머지 참가자들의 상태는 종료로 설정
+          // }
         }
 
         // Firebase에서 상태 업데이트

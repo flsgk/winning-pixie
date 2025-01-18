@@ -32,6 +32,7 @@ import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css"; // Quill 기본 스타일
 import AWS from "aws-sdk";
 import { useNavigate } from "react-router-dom";
+import GoBackButton from "./GoBackButton";
 
 // api 호출 함수
 const fetchGameData = async (year, month, team) => {
@@ -61,10 +62,14 @@ const Record = ({ selectedTeam }) => {
 
   // AWS S3 설정
   AWS.config.update({
-    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-    region: process.env.AWS_REGION,
+    accessKeyId: process.env.REACT_APP_AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.REACT_APP_AWS_SECRET_ACCESS_KEY,
+    region: process.env.REACT_APP_AWS_REGION,
   });
+
+  console.log(process.env.REACT_APP_AWS_ACCESS_KEY_ID);
+  console.log(process.env.REACT_APP_AWS_SECRET_ACCESS_KEY);
+  console.log(process.env.REACT_APP_AWS_REGION);
   const s3 = new AWS.S3();
 
   // 이미지 업로드 함수
@@ -236,6 +241,7 @@ const Record = ({ selectedTeam }) => {
 
   return (
     <Stack>
+      <GoBackButton />
       <Typography level="h2" component="h1" sx={{ mt: 1, mb: 2 }}>
         직관 기록하기
       </Typography>
