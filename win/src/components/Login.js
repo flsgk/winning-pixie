@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import FormLabel from "@mui/joy/FormLabel";
 import Input from "@mui/joy/Input";
 import Button from "@mui/joy/Button";
@@ -38,6 +38,9 @@ const Login = () => {
 
   return (
     <>
+      <Link to="/signup">
+        <Button>회원가입</Button>
+      </Link>
       <Box
         sx={{
           display: "flex",

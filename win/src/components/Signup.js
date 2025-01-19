@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import useSignupForm from "./useSignupForm";
 import FormLabel from "@mui/joy/FormLabel";
 import Input from "@mui/joy/Input";
@@ -33,10 +33,12 @@ function Signup() {
         textAlign: "center",
       }}
     >
+      <Link to="/login">
+        <Button>로그인</Button>
+      </Link>
       <Typography component="h1" level="h3">
         회원가입
       </Typography>
-
       {errors.allField && <Typography>{errors.fullname}</Typography>}
       <Box sx={{ width: "300px" }}>
         <FormControl error={errors.fullname} sx={{ mb: 2 }}>
