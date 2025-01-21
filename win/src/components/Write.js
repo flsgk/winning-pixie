@@ -14,7 +14,6 @@ import Button from "@mui/joy/Button";
 import Box from "@mui/joy/Box";
 import GoBackButton from "./GoBackButton";
 import { auth, database } from "../firebase";
-import { getAuth } from "firebase/auth";
 import { onValue, ref } from "firebase/database";
 
 function Write() {

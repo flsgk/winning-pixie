@@ -23,53 +23,51 @@ import {
 } from "@mui/joy";
 import SendRoundedIcon from "@mui/icons-material/SendRounded";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
-
 import GoBackButton from "./GoBackButton";
+import {
+  setChatRoomInfo,
+  setGameInfo,
+  setMessages,
+  addMessage,
+  setCurrentUserId,
+} from "../redux/chatSlice";
+import { useDispatch, useSelector } from "react-redux";
 
 const socket = io("http://localhost:4000"); // 서버와 웹소켓 통신 설정, 여기에서 4000번 포트를 확인
 
 const ChatRoom = () => {
   const { roomId } = useParams();
   const { id } = useParams(); // URL에서 ID 가져오기
+  const dispatch = useDispatch();
+  const [input, setInput] = useState("");
 
-  const [messages, setMessages] = useState([]); // 채팅 메시지 저장
-  const [input, setInput] = useState(""); // 입력 중인 메시지
-  const [currentUserId, setCurrentUserId] = useState(null); // 현재 사용자 Id
-  const [chatRoomInfo, setChatRoomInfo] = useState(null); // 채팅방 정보
-  const [gameInfo, setGameInfo] = useState(null); // 경기 정보
+  const { chatRoomInfo, gameInfo, messages, currentUserId } = useSelector(
+    (state) => state.chat
+  );
 
   // 유저 정보 가져오기
   useEffect(() => {
     const auth = getAuth();
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
-        setCurrentUserId(user.uid);
+        dispatch(setCurrentUserId(user.uid));
       } else {
-        setCurrentUserId(null);
+        dispatch(setCurrentUserId(null));
       }
     });
     return () => unsubscribe();
-  }, []);
+  }, [dispatch]);
 
-  // 채팅방 입장 및 메시지 수신
+  // 채팅방 정보와 메시지 가져오기
   useEffect(() => {
     // 방에 입장
     socket.emit("join room", roomId);
 
-    // 서버에서 메시지를 받는 이벤트
-    socket.on("chat message", (msg) => {
-      if (msg.roomId === roomId) {
-        setMessages((prevMessages) => [...prevMessages, msg]); // 해당 roomId에만 메시지 추가
-      }
-    });
-
     // 체팅방 정보 가져오기
-
-    console.log(chatRoomInfo); // chatRoomInfo가 제대로 로드되었는지 확인
     const chatRoomRef = ref(database, `chatRooms/${roomId}`);
     onValue(chatRoomRef, (snapshot) => {
       if (snapshot.exists()) {
-        setChatRoomInfo(snapshot.val());
+        dispatch(setChatRoomInfo(snapshot.val()));
       } else {
         console.error("채팅방 정보를 찾을 수 없습니다.");
       }
@@ -78,9 +76,18 @@ const ChatRoom = () => {
     const gameInfoRef = ref(database, `posts/${id}`);
     onValue(gameInfoRef, (snapshot) => {
       if (snapshot.exists()) {
-        setGameInfo(snapshot.val());
+        dispatch(setGameInfo(snapshot.val()));
       } else {
         console.error("게임 정보를 찾을 수 없습니다.");
+      }
+    });
+
+    // 메시지 가져오기
+    const messageRef = ref(database, `chatRooms/${roomId}/messages`);
+    onValue(messageRef, (snapshot) => {
+      const messagesData = snapshot.val();
+      if (messagesData) {
+        dispatch(setMessages(Object.values(messagesData)));
       }
     });
 
@@ -90,56 +97,35 @@ const ChatRoom = () => {
       socket.off("chat message"); // 메시지 수신 이벤트 해제
       off(chatRoomRef);
       off(gameInfoRef);
+      off(messageRef);
     };
-  }, [roomId]);
+  }, [dispatch, id, roomId]);
 
   // 메시지 전송
   const sendMessage = () => {
-    if (input) {
-      console.log(input);
-      const user = auth.currentUser;
+    if (input && currentUserId && chatRoomInfo) {
+      const senderNickname =
+        currentUserId === chatRoomInfo.authorUid
+          ? chatRoomInfo.authorNickname
+          : chatRoomInfo.applicantNickname;
 
-      if (user) {
-        if (!chatRoomInfo) {
-          console.error("채팅방 정보(chatRoomInfo)가 로드되지 않았습니다.");
-          return; // chatRoomInfo가 null이면 실행하지 않음
-        }
-        const senderNickname =
-          currentUserId === chatRoomInfo.authorUid
-            ? chatRoomInfo.authorNickname
-            : chatRoomInfo.applicantNickname;
+      const messageData = {
+        roomId,
+        text: input,
+        sender: currentUserId,
+        senderNickname: senderNickname,
+        timestamp: serverTimestamp(), // 서버 시간 저장
+      };
 
-        const messageData = {
-          roomId,
-          text: input,
-          sender: currentUserId,
-          senderNickname: senderNickname,
-          timestamp: serverTimestamp(), // 서버 시간 저장
-        };
+      // Firebase 데이터베이스에 저장
+      const messageRef = ref(database, `chatRooms/${roomId}/messages`);
+      push(messageRef, messageData);
 
-        // Firebase 데이터베이스에 저장
-        const messageRef = ref(database, `chatRooms/${roomId}/messages`);
-        push(messageRef, messageData);
-
-        socket.emit("chat message", messageData); // 서버로 입력한 값을 전송
-        setInput("");
-      }
+      socket.emit("chat message", messageData); // 서버로 입력한 값을 전송
+      dispatch(addMessage(messageData));
+      setInput("");
     }
   };
-
-  // 채팅방에서 메시지 가져오기
-  useEffect(() => {
-    const messageRef = ref(database, `chatRooms/${roomId}/messages`);
-    onValue(messageRef, (snapshot) => {
-      const messagesData = snapshot.val();
-      if (messagesData) {
-        setMessages(Object.values(messagesData));
-      }
-    });
-    return () => {
-      off(messageRef);
-    };
-  }, [roomId]);
 
   const handleKeyDown = (e) => {
     if (e.key === "Enter" && !e.shiftKey) {
