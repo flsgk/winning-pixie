@@ -17,7 +17,7 @@ import Record from "./components/Record.jsx";
 import ChatRoom from "./components/ChatRoom.jsx";
 import EditPost from "./components/EditPost.jsx";
 import RecordDetail from "./components/RecordDetail.jsx";
-import ChatList from "./components/ChatList.jsx";
+import ChatPage from "./components/ChatList.jsx";
 
 function App() {
   const dispatch = useDispatch();
@@ -114,10 +114,7 @@ function App() {
             path="/record"
             element={<Record selectedTeam={selectedTeam} />}
           ></Route>
-          <Route
-            path="/chat-list"
-            element={<ChatList selectedTeam={selectedTeam} />}
-          ></Route>
+          <Route path="/chat-page" element={<ChatPage />}></Route>
           <Route
             path="/users/:uid/records/:team/:date"
             element={<RecordDetail selectedTeam={selectedTeam} />}

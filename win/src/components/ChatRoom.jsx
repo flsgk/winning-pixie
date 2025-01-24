@@ -35,11 +35,15 @@ import { useDispatch, useSelector } from "react-redux";
 
 const socket = io("http://localhost:4000"); // 서버와 웹소켓 통신 설정, 여기에서 4000번 포트를 확인
 
-const ChatRoom = () => {
-  const { roomId } = useParams();
-  const { id } = useParams(); // URL에서 ID 가져오기
+const ChatRoom = ({ id: propsId, roomId: propsRoomId }) => {
+  const { id: paramId, roomId: paramRoomId } = useParams(); // URL에서 id와 roomId 가져오기
+  const id = propsId || paramId; // props로 전달된 id가 있으면 사용하고, 없으면 URL에서 가져오기
+  const roomId = propsRoomId || paramRoomId; // props로 전달된 roomId가 있으면 사용하고, 없으면 URL에서 가져오기
   const dispatch = useDispatch();
   const [input, setInput] = useState("");
+
+  console.log("Props - id:", id);
+  console.log("Props - roomId:", roomId);
 
   const { chatRoomInfo, gameInfo, messages, currentUserId } = useSelector(
     (state) => state.chat
@@ -57,6 +61,12 @@ const ChatRoom = () => {
     });
     return () => unsubscribe();
   }, [dispatch]);
+
+  useEffect(() => {
+    console.log("chatRoomInfo", chatRoomInfo);
+    console.log("gameInfo", gameInfo);
+    console.log("messages", messages);
+  }, [chatRoomInfo, gameInfo, messages]);
 
   // 채팅방 정보와 메시지 가져오기
   useEffect(() => {

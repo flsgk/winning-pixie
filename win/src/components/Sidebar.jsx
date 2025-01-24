@@ -96,7 +96,7 @@ function Sidebar({ nickname, onTabChange }) {
           </ListItem>
 
           <ListItem>
-            <ListItemButton onClick={() => onTabChange("chat-list")}>
+            <ListItemButton onClick={() => onTabChange("chat-page")}>
               <QuestionAnswerRoundedIcon />
               <ListItemContent>
                 <Typography level="title-sm">내 채팅</Typography>

@@ -1,4 +1,4 @@
-import { Box, Button, ButtonGroup, Card } from "@mui/joy";
+import { Box, Button, ButtonGroup, Card, Typography } from "@mui/joy";
 import { getAuth } from "firebase/auth";
 import { equalTo, get, orderByChild, query, ref } from "firebase/database";
 import React, { useEffect, useState } from "react";
@@ -6,12 +6,12 @@ import { database } from "../firebase";
 import ChatRoom from "./ChatRoom";
 import { useNavigate } from "react-router-dom";
 
-const ChatList = () => {
+const ChatList = ({ onSelectedChatRoom }) => {
   const [chatAuthor, setChatAuthor] = useState([]);
   const [chatApplicant, setChatApplicant] = useState([]);
   const [isWhoFilter, setIsWhoFilter] = useState("");
   const [selectedTab, setSelectedTab] = useState("author"); // 기본 값은 글 주인으로 설정
-  const [selectedChat, setSelectedChat] = useState(null);
+  // const [selectedChat, setSelectedChat] = useState(null);
 
   const auth = getAuth();
   const currentUser = auth.currentUser;
@@ -88,9 +88,8 @@ const ChatList = () => {
     fetchChatRoomsByApplicantUid();
   }, [currentUser]);
 
-  const handleChatClick = (chat) => {
-    navigate(`/post/${chat.postId}/chat/${chat.roomId}`); // 생성된 채팅방으로 이동
-  };
+  console.log("chatAuthor:", chatAuthor);
+  console.log("chatApplicant:", chatApplicant);
 
   return (
     <>
@@ -105,13 +104,19 @@ const ChatList = () => {
             chatAuthor.map((chat, index) => (
               <Card
                 key={index}
-                onClick={() => handleChatClick(chat)}
+                onClick={() =>
+                  onSelectedChatRoom({
+                    roomId: chat.roomId,
+                    postId: chat.postId,
+                  })
+                }
                 sx={{
                   width: "300px",
                   height: "100px",
                 }}
               >
-                {chat.roomId}
+                <Typography>룸 아이디 :{chat.roomId}</Typography>
+                <Typography>글 아이디 :{chat.postId}</Typography>
                 <p>{chat.applicantNickname + "님"}</p>
                 {chat.messages ? (
                   (() => {
@@ -148,13 +153,19 @@ const ChatList = () => {
             chatApplicant.map((chat, index) => (
               <Card
                 key={index}
-                onClick={() => handleChatClick(chat)}
+                onClick={() =>
+                  onSelectedChatRoom({
+                    roomId: chat.roomId,
+                    postId: chat.postId,
+                  })
+                }
                 sx={{
                   width: "300px",
                   height: "600px",
                 }}
               >
-                {chat.roomId}
+                <Typography>룸 아이디 :{chat.roomId}</Typography>
+                <Typography>글 아이디 :{chat.postId}</Typography>
                 <p>{chat.authorNickname + "님"}</p>
                 {chat.messages ? (
                   (() => {
@@ -183,12 +194,6 @@ const ChatList = () => {
             <p></p>
           )}
         </>
-      )}
-
-      {selectedChat && (
-        <Box>
-          <ChatRoom chat={selectedChat} />
-        </Box>
       )}
     </>
   );
