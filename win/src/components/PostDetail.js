@@ -1,6 +1,6 @@
 // PostDetail.js
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ref, get, update, onValue, set, getDatabase } from "firebase/database";
 import { database } from "../firebase";
@@ -30,12 +30,15 @@ import CalendarMonthRoundedIcon from "@mui/icons-material/CalendarMonthRounded";
 import AccountCircleRoundedIcon from "@mui/icons-material/AccountCircleRounded";
 import FavoriteRoundedIcon from "@mui/icons-material/FavoriteRounded";
 import PeopleRoundedIcon from "@mui/icons-material/PeopleRounded";
+import ArrowLeftRoundedIcon from "@mui/icons-material/ArrowLeftRounded";
+import ArrowRightRoundedIcon from "@mui/icons-material/ArrowRightRounded";
 
 function PostDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const auth = getAuth();
   const currentUser = auth.currentUser;
+  const scrollRef = useRef(null);
 
   const [post, setPost] = useState(null); // 현재 게시물 정보를 저장
   const [loading, setLoading] = useState(true); // 데이터 로딩 여부를 확인
@@ -267,6 +270,7 @@ function PostDetail() {
       console.error("Error creating chat room:", error);
     }
   };
+
   const handleStatus = async (applicant, index) => {
     console.log("Index2: ", index);
     try {
@@ -324,98 +328,248 @@ function PostDetail() {
 
   console.log("accepted count:", acceptedCount); // 'accepted' 상태인 applicants의 개수 출력
 
+  const scroll = (direction) => {
+    if (scrollRef.current) {
+      const scrollAmount = 60;
+      scrollRef.current.scrollLeft += direction * scrollAmount;
+    }
+  };
+
   return (
-    <Box>
-      <GoBackButton />
-      <Card sx={{ width: 500 }}>
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: "center",
-          }}
-        >
-          <Chip
-            color={post.status === "모집 중" ? "success" : "neutral"}
+    <>
+      <Box sx={{ marginLeft: "10px" }}>
+        <GoBackButton />
+      </Box>
+
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column", // 필요시 세로 방향 정렬
+          justifyContent: "center", // 상단부터 정렬
+          alignItems: "center",
+        }}
+      >
+        <Card sx={{ width: 800 }}>
+          <Box
             sx={{
-              mr: "5px",
+              display: "flex",
+              alignItems: "center",
             }}
           >
-            {post.status}
-          </Chip>
-          <Chip>{post.yourTeam}</Chip>
+            <Chip
+              color={post.status === "모집 중" ? "success" : "neutral"}
+              sx={{
+                mr: "5px",
+              }}
+            >
+              {post.status}
+            </Chip>
+            <Chip>{post.yourTeam}</Chip>
+          </Box>
+          <Typography level="h2">{post.title}</Typography>
+
+          <Typography
+            level="body-xs"
+            sx={{
+              display: "flex", // 아이콘과 글씨를 한 줄로 정렬
+              alignItems: "center", // 글씨를 세로로 맞춰서 정렬
+              gap: "4px",
+            }} // 아이콘과 글씨 사이에 간격 주기
+          >
+            <CalendarMonthRoundedIcon
+              sx={{ fontSize: "1rem", marginRight: "4px" }}
+            />
+            {new Date(post.playDate).toLocaleDateString("ko-KR", {
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+            })}
+          </Typography>
+
+          <Typography
+            level="body-xs"
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              gap: "4px",
+            }}
+          >
+            <AccountCircleRoundedIcon
+              sx={{ fontSize: "1rem", marginRight: "4px" }}
+            />
+            {post.authorNickname}님
+          </Typography>
+
+          <Typography
+            level="body-xs"
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              gap: "4px",
+            }}
+          >
+            <PeopleRoundedIcon sx={{ fontSize: "1rem", marginRight: "4px" }} />
+            참여 중인 인원 {applicantCount}/{post.capacity}
+          </Typography>
+
+          <Typography
+            level="body-xs"
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              gap: "4px",
+            }}
+          >
+            <FavoriteRoundedIcon
+              sx={{ fontSize: "1rem", marginRight: "4px" }}
+            />{" "}
+            {post.yourTeam} 팀의 승리요정을 찾고 있어요!
+          </Typography>
+          <Divider />
+          <div dangerouslySetInnerHTML={{ __html: post.content }} />
+
+          <Divider />
+          {isAuthor ? (
+            <Button onClick={() => navigate(`/edit/${id}`)}>편집하기</Button>
+          ) : (
+            !isApplicant &&
+            !applying && (
+              <Button onClick={() => setApplying(true)}>참여하기</Button>
+            )
+          )}
+
+          {isApplicant && <Button disabled>참여 완료</Button>}
+        </Card>
+
+        <Box marginTop={4} sx={{ width: "800px" }}>
+          <Typography level="h3">참여하고 싶어요!</Typography>
+          <Divider sx={{ marginY: 2 }} />
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "row",
+              gap: 2,
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <Button
+              onClick={() => scroll(-1)}
+              sx={{
+                marginRight: 2,
+                borderRadius: "40px",
+                width: "10px",
+                height: "10px",
+              }}
+            >
+              <ArrowLeftRoundedIcon />
+            </Button>
+            {post.applicants && (
+              <Box
+                ref={scrollRef}
+                sx={{
+                  display: "flex",
+                  flexDirection: "row",
+                  gap: 2,
+                  overflowX: "auto",
+                }}
+              >
+                {applicants.map((applicant, index) => (
+                  <Card key={index} className="applicant-card">
+                    <Box
+                      sx={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                      }}
+                    >
+                      <Typography level="body-sm">
+                        {applicant.nickname} 요정님
+                      </Typography>
+                      <Chip color="primary">{applicant.team}</Chip>
+                    </Box>
+                    <Typography level="body-sm">{applicant.memo}</Typography>
+                    <Chip
+                      color={
+                        applicant.status === "accepted" ? "success" : "neutral"
+                      }
+                    >
+                      {applicant.status}
+                    </Chip>
+                    <Box sx={{ display: "flex", flexDirection: "row", gap: 2 }}>
+                      {isAuthor && (
+                        <Button
+                          onClick={() => handleStatus(applicant, index)}
+                          sx={{
+                            width: "80px",
+                            fontSize: "10px",
+                          }}
+                        >
+                          {applicant.status === "accepted"
+                            ? "수락 취소"
+                            : "수락"}
+                        </Button>
+                      )}
+                      {!isAuthor &&
+                        applicant.nickname === formData.nickname && (
+                          <Button
+                            disabled={applicant.status === "종료"}
+                            onClick={() => setIsEdit(true)}
+                            sx={{
+                              width: "80px",
+                              fontSize: "10px",
+                            }}
+                          >
+                            수정하기
+                          </Button>
+                        )}
+
+                      {isAuthor ? (
+                        <Button
+                          onClick={() => handleChat(applicant, index)}
+                          sx={{
+                            width: "100px",
+                            fontSize: "10px",
+                          }}
+                        >
+                          {applicant.roomId ? "채팅 이동하기" : "채팅하기"}
+                        </Button>
+                      ) : (
+                        applicant.nickname === formData.nickname &&
+                        applicant.roomId && (
+                          <Button
+                            disabled={applicant.status === "종료"}
+                            onClick={() => handleChat(applicant, index)}
+                            sx={{
+                              width: "100px",
+                              fontSize: "10px",
+                            }}
+                          >
+                            {applicant.status !== "종료"
+                              ? "채팅 이동하기"
+                              : "다음에 만나요"}
+                          </Button>
+                        )
+                      )}
+                    </Box>
+                  </Card>
+                ))}
+              </Box>
+            )}
+            <Button
+              onClick={() => scroll(1)}
+              sx={{
+                marginRight: 2,
+                borderRadius: "40px",
+                width: "10px",
+                height: "10px",
+              }}
+            >
+              <ArrowRightRoundedIcon />
+            </Button>
+          </Box>
         </Box>
-        <Typography level="h2">{post.title}</Typography>
-
-        <Typography
-          level="body-xs"
-          sx={{
-            display: "flex", // 아이콘과 글씨를 한 줄로 정렬
-            alignItems: "center", // 글씨를 세로로 맞춰서 정렬
-            gap: "4px",
-          }} // 아이콘과 글씨 사이에 간격 주기
-        >
-          <CalendarMonthRoundedIcon
-            sx={{ fontSize: "1rem", marginRight: "4px" }}
-          />
-          {new Date(post.playDate).toLocaleDateString("ko-KR", {
-            year: "numeric",
-            month: "long",
-            day: "numeric",
-          })}
-        </Typography>
-
-        <Typography
-          level="body-xs"
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            gap: "4px",
-          }}
-        >
-          <AccountCircleRoundedIcon
-            sx={{ fontSize: "1rem", marginRight: "4px" }}
-          />
-          {post.authorNickname}님
-        </Typography>
-
-        <Typography
-          level="body-xs"
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            gap: "4px",
-          }}
-        >
-          <PeopleRoundedIcon sx={{ fontSize: "1rem", marginRight: "4px" }} />
-          참여 중인 인원 {applicantCount}/{post.capacity}
-        </Typography>
-
-        <Typography
-          level="body-xs"
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            gap: "4px",
-          }}
-        >
-          <FavoriteRoundedIcon sx={{ fontSize: "1rem", marginRight: "4px" }} />{" "}
-          {post.yourTeam} 팀의 승리요정을 찾고 있어요!
-        </Typography>
-        <Divider />
-        <div dangerouslySetInnerHTML={{ __html: post.content }} />
-
-        <Divider />
-        {isAuthor ? (
-          <Button onClick={() => navigate(`/edit/${id}`)}>편집하기</Button>
-        ) : (
-          !isApplicant &&
-          !applying && (
-            <Button onClick={() => setApplying(true)}>참여하기</Button>
-          )
-        )}
-
-        {isApplicant && <Button disabled>참여 완료</Button>}
-      </Card>
+      </Box>
 
       {applying && (
         <Modal
@@ -557,92 +711,7 @@ function PostDetail() {
           </ModalDialog>
         </Modal>
       )}
-
-      {post.applicants && (
-        <Box sx={{ marginTop: 2 }}>
-          <Typography level="h3">참여하고 싶어요!</Typography>
-          <Stack spacing={2} sx={{ width: 300 }}>
-            {applicants.map((applicant, index) => (
-              <Card key={index} className="applicant-card">
-                <Box
-                  sx={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                  }}
-                >
-                  <Typography level="body-sm">
-                    {applicant.nickname} 요정님
-                  </Typography>
-                  <Chip color="primary">{applicant.team}</Chip>
-                </Box>
-                <Typography level="body-sm">{applicant.memo}</Typography>
-                <Chip
-                  color={
-                    applicant.status === "accepted" ? "success" : "neutral"
-                  }
-                >
-                  {applicant.status}
-                </Chip>
-                <Box sx={{ display: "flex", flexDirection: "row", gap: 2 }}>
-                  {isAuthor && (
-                    <Button
-                      onClick={() => handleStatus(applicant, index)}
-                      sx={{
-                        width: "80px",
-                        fontSize: "10px",
-                      }}
-                    >
-                      {applicant.status === "accepted" ? "수락 취소" : "수락"}
-                    </Button>
-                  )}
-                  {!isAuthor && applicant.nickname === formData.nickname && (
-                    <Button
-                      disabled={applicant.status === "종료"}
-                      onClick={() => setIsEdit(true)}
-                      sx={{
-                        width: "80px",
-                        fontSize: "10px",
-                      }}
-                    >
-                      수정하기
-                    </Button>
-                  )}
-
-                  {isAuthor ? (
-                    <Button
-                      onClick={() => handleChat(applicant, index)}
-                      sx={{
-                        width: "100px",
-                        fontSize: "10px",
-                      }}
-                    >
-                      {applicant.roomId ? "채팅 이동하기" : "채팅하기"}
-                    </Button>
-                  ) : (
-                    applicant.nickname === formData.nickname &&
-                    applicant.roomId && (
-                      <Button
-                        disabled={applicant.status === "종료"}
-                        onClick={() => handleChat(applicant, index)}
-                        sx={{
-                          width: "100px",
-                          fontSize: "10px",
-                        }}
-                      >
-                        {applicant.status !== "종료"
-                          ? "채팅 이동하기"
-                          : "다음에 만나요"}
-                      </Button>
-                    )
-                  )}
-                </Box>
-              </Card>
-            ))}
-          </Stack>
-        </Box>
-      )}
-    </Box>
+    </>
   );
 }
 

@@ -129,6 +129,7 @@ function Schedule({ selectedTeam, onEventClick }) {
         <FullCalendar
           plugins={[dayGridPlugin, interactionPlugin]}
           initialView="dayGridMonth"
+          dayCellClassNames="custom-day-cell"
           events={events}
           locale="ko"
           headerToolbar={{
@@ -138,7 +139,7 @@ function Schedule({ selectedTeam, onEventClick }) {
           datesSet={handleDatesSet}
           eventClick={handleEventClick} // 이벤트 클릭 핸들러 추가
           width="100%" // 달력의 너비를 100%로 설정하여 가득 차게 함
-          contentHeight="600px" // 달력 높이를 고정하여 6줄 이상 나오지 않도록 설정
+          contentHeight="480px" // 달력 높이를 고정하여 6줄 이상 나오지 않도록 설정
           eventMouseEnter={handleEventMouseEnter}
           eventMouseLeave={handleEventMouseLeave}
         />

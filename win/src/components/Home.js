@@ -125,255 +125,235 @@ function Home({ isLoggedIn, posts }) {
   return (
     <>
       {isLoggedIn ? (
-        <Grid
-          container
-          spacing={2}
-          sx={{
-            flexGrow: 1,
-            display: "flex",
-            justifyContent: "space-between",
-            paddingX: 5,
-          }}
-        >
-          <Grid item xs={8}>
-            <div className="header">
-              <Typography level="h1">승리요정🧚🏻‍♀️</Typography>
-              <Typography level="title-sm">
-                안녕하세요, {nickname} 요정님
-              </Typography>
-              <Typography level="title-sm">
-                짜릿한 승리를 함께할 요정을 찾아보세요!
-              </Typography>
-            </div>
-          </Grid>
+        <>
+          {/* 첫 번째 Grid container */}
           <Grid
-            item
-            xs={4}
+            container
+            spacing={2}
             sx={{
-              display: "flex", // Flexbox 활성화
-              justifyContent: "flex-end", // 내부에서 오른쪽 정렬
-              alignItems: "center", // 세로 정렬
+              flexGrow: 1,
+              display: "flex",
+              justifyContent: "space-between",
+              paddingX: 5,
             }}
           >
-            <Box
+            <Grid item xs={8}>
+              <Box marginTop={3}>
+                <Typography
+                  level="h1"
+                  sx={{
+                    fontFamily: "PartialSansKR-Regular",
+                    marginBottom: 3,
+                  }}
+                >
+                  승리요정🧚🏻‍♀️
+                </Typography>
+                <Typography level="title-sm">
+                  안녕하세요, {nickname} 요정님
+                </Typography>
+                <Typography level="title-sm">
+                  짜릿한 승리를 함께할 요정을 찾아보세요!
+                </Typography>
+              </Box>
+            </Grid>
+
+            <Grid
+              item
+              xs={4}
               sx={{
-                display: "flex", // 요소를 가로로 배치
-                gap: 1, // 요소 간의 간격 (theme.spacing 단위, 기본적으로 8px)
-                alignItems: "center", // 세로 정렬을 중앙으로 맞추기 (선택 사항)
+                display: "flex",
+                justifyContent: "flex-end",
+                alignItems: "center",
               }}
             >
-              <Logout />
-              <Link to="/my-page">
-                <Button
-                  color="neutral"
-                  variant="soft"
-                  sx={{ borderRadius: 10, width: "100px" }}
+              <Box
+                marginBottom={3}
+                sx={{
+                  display: "flex",
+                  gap: 1,
+                  alignItems: "center",
+                }}
+              >
+                <Logout />
+                <Link to="/my-page">
+                  <Button
+                    color="neutral"
+                    variant="soft"
+                    sx={{ borderRadius: 10, width: "100px" }}
+                  >
+                    MY
+                  </Button>
+                </Link>
+              </Box>
+            </Grid>
+
+            {/* 두 번째 Grid container */}
+
+            <Grid item xs={8}>
+              <Box>
+                <Schedule
+                  selectedTeam={selectedTeam}
+                  onEventClick={handleEventClick}
+                />
+              </Box>
+            </Grid>
+
+            {/* selectedDate가 있을 때만 출력 */}
+            {selectedDate && (
+              <Grid item xs={4}>
+                <Box
+                  sx={{
+                    height: "600px",
+                    padding: "10px",
+                  }}
                 >
-                  MY
-                </Button>
-              </Link>
-            </Box>
-          </Grid>
+                  <Typography level="h4">
+                    {new Date(selectedDate).toLocaleDateString("ko-KR", {
+                      month: "long",
+                      day: "numeric",
+                    })}
+                    의 승리요정을 찾고 있어요!
+                  </Typography>
 
-          <Grid container spacing={2} sx={{ flexGrow: 1 }}>
-            <>
-              <Grid item xs={12} sm={8}>
-                <Box sx={{ marginTop: 5 }}>
-                  <Schedule
-                    selectedTeam={selectedTeam}
-                    onEventClick={handleEventClick}
-                  />
-                </Box>
-              </Grid>
-
-              {selectedDate ? (
-                <Grid item xs={12} sm={4} sx={{ paddingX: 4 }}>
                   <Box
                     sx={{
-                      marginTop: "90px",
-                      backgroundColor: "#f7f7f7",
-                      borderRadius: "20px",
-                      height: "600px",
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      marginTop: 1,
                     }}
                   >
-                    <Box
-                      sx={{
-                        padding: "10px",
-                      }}
+                    <Link
+                      to={`/write?date=${selectedDate}&teams=${selectedTeams.join(
+                        ","
+                      )}`}
                     >
-                      <Typography level="h4">
-                        {new Date(selectedDate).toLocaleDateString("ko-KR", {
-                          month: "long",
-                          day: "numeric",
-                        })}
-                        의 승리요정을 찾고 있어요!
-                      </Typography>
-
-                      {/* 글 목록 및 필터 버튼 */}
-                      <Box
+                      <Button
+                        startDecorator={<Add />}
+                        color="neutral"
+                        variant="solid"
                         sx={{
-                          display: "flex",
-                          justifyContent: "space-between",
-                          alignItems: "center",
-                          marginTop: 1,
+                          borderRadius: "20px",
                         }}
                       >
-                        <Link
-                          to={`/write?date=${selectedDate}&teams=${selectedTeams.join(
-                            ","
-                          )}`}
+                        글쓰기
+                      </Button>
+                    </Link>
+                    <ButtonGroup
+                      aria-label="radius button group"
+                      sx={{
+                        marginBottom: 1,
+                        marginTop: 1,
+                        "--ButtonGroup-radius": "40px",
+                      }}
+                    >
+                      {selectedTeams.map((team, index) => (
+                        <Button
+                          key={index}
+                          onClick={() => handleTeamFilter(team)}
+                          className={
+                            selectedTeamFilter === team ? "active" : ""
+                          }
                         >
-                          <Button
-                            startDecorator={<Add />}
-                            color="neutral"
-                            variant="solid"
-                            sx={{
-                              borderRadius: "20px",
-                            }}
-                          >
-                            글쓰기
-                          </Button>
-                        </Link>
-                        <ButtonGroup
-                          spacing="0.5rem"
-                          aria-label="spacing button group"
-                          sx={{
-                            marginBottom: 1,
-                            marginTop: 1,
-                            borderRadius: "20px",
-                          }}
-                        >
-                          {selectedTeams.map((team, index) => (
-                            <Button
-                              key={index}
-                              onClick={() => handleTeamFilter(team)}
-                              className={
-                                selectedTeamFilter === team ? "active" : ""
-                              }
+                          {team}
+                        </Button>
+                      ))}
+                      <Button
+                        onClick={() => handleTeamFilter("기타")}
+                        className={
+                          selectedTeamFilter === "기타" ? "active" : ""
+                        }
+                      >
+                        기타
+                      </Button>
+                    </ButtonGroup>
+                  </Box>
+                  <Divider orientation="horizontal" />
+
+                  {/* 필터된 글 목록 */}
+                  {filteredPosts.length > 0 ? (
+                    <Box
+                      sx={{
+                        display: "flex",
+                        flexDirection: "column",
+                        justifyContent: "center",
+                        maxHeight: 500,
+                        overflowY: "auto",
+                        paddingX: 1,
+                        padding: "5px",
+                      }}
+                    >
+                      {displayedPosts.map(
+                        (post) =>
+                          post.status === "모집 중" && (
+                            <Link
+                              to={`/post/${post.id}`}
+                              style={{ textDecoration: "none" }}
+                              key={post.id}
                             >
-                              {team}
-                            </Button>
-                          ))}
-                          <Button
-                            onClick={() => handleTeamFilter("기타")}
-                            className={
-                              selectedTeamFilter === "기타" ? "active" : ""
-                            }
-                            sx={{
-                              borderRadius: "20px",
-                            }}
-                          >
-                            기타
-                          </Button>
-                        </ButtonGroup>
-                      </Box>
-                      <Divider orientation="horizontal" />
-
-                      {filteredPosts.length > 0 ? (
-                        <Box
-                          sx={{
-                            display: "flex",
-                            flexDirection: "column",
-                            justifyContent: "center",
-                            maxHeight: 500, // 최대 높이 설정 (필요에 맞게 조정)
-                            overflowY: "auto", // 세로 스크롤 활성화
-                            paddingX: 1, // 부모 컨테이너 내부 여백 추가
-                            padding: "5px",
-                          }}
-                        >
-                          {displayedPosts.map(
-                            (post) =>
-                              post.status === "모집 중" && (
-                                <Link
-                                  to={`/post/${post.id}`}
-                                  style={{ textDecoration: "none" }}
-                                >
-                                  <Card
-                                    key={post.id}
-                                    className="post-card"
-                                    variant="outlined"
+                              <Card
+                                variant="outlined"
+                                sx={{
+                                  width: "350px",
+                                  maxWidth: "100%",
+                                  margin: "auto",
+                                  marginBottom: 1,
+                                  marginTop: 1,
+                                  boxShadow: "sm",
+                                  "@media (max-width: 480px)": {
+                                    width: "200px",
+                                  },
+                                }}
+                              >
+                                <CardContent>
+                                  <Box
                                     sx={{
-                                      width: "350px",
-                                      maxWidth: "100%", // 화면 너비에 따라 너무 커지지 않도록 제한
-                                      margin: "auto", // 가로 정렬을 중앙으로
-                                      marginBottom: 1,
-                                      marginTop: 1,
-                                      boxShadow: "sm",
-
-                                      "@media (max-width: 480px)": {
-                                        width: "200px", // 화면 너비가 600px 이하일 때는 100%로 설정
-                                      },
+                                      display: "flex",
+                                      justifyContent: "space-between",
+                                      alignItems: "center",
                                     }}
                                   >
-                                    <CardContent>
-                                      <Box
-                                        className="post-header"
-                                        sx={{
-                                          display: "flex",
-                                          justifyContent: "space-between",
-                                          alignItems: "center",
-                                        }}
-                                      >
-                                        <Box>
-                                          <Typography level="title-lg">
-                                            {post.title}
-                                          </Typography>
-                                        </Box>
+                                    <Typography level="title-lg">
+                                      {post.title}
+                                    </Typography>
+                                    <Chip
+                                      color={
+                                        post.status === "모집 중"
+                                          ? "success"
+                                          : "neutral"
+                                      }
+                                    >
+                                      {post.status}
+                                    </Chip>
+                                  </Box>
 
-                                        <Box>
-                                          <Chip
-                                            color={
-                                              post.status === "모집 중"
-                                                ? "success"
-                                                : "neutral"
-                                            }
-                                            sx={{
-                                              mr: 0.5,
-                                            }}
-                                          >
-                                            {post.status}
-                                          </Chip>
-                                          <Chip size="md" variant="soft">
-                                            {post.yourTeam}
-                                          </Chip>
-                                        </Box>
-                                      </Box>
-
-                                      <Typography
-                                        level="body-sm"
-                                        className="post-date"
-                                        sx={{
-                                          display: "flex",
-                                          alignItems: "center",
-                                          gap: "4px",
-                                        }}
-                                      >
-                                        <EditRoundedIcon
-                                          sx={{
-                                            fontSize: "1rem",
-                                            marginRight: "4px",
-                                          }}
-                                        />
-                                        {post.createdDate}
-                                      </Typography>
-                                    </CardContent>
-                                  </Card>
-                                </Link>
-                              )
-                          )}
-                        </Box>
-                      ) : (
-                        <Box sx={{ padding: 2 }}>작성된 글이 없습니다.</Box>
+                                  <Typography
+                                    level="body-sm"
+                                    sx={{
+                                      display: "flex",
+                                      alignItems: "center",
+                                      gap: "4px",
+                                    }}
+                                  >
+                                    <EditRoundedIcon
+                                      sx={{ fontSize: "1rem" }}
+                                    />
+                                    {post.createdDate}
+                                  </Typography>
+                                </CardContent>
+                              </Card>
+                            </Link>
+                          )
                       )}
                     </Box>
-                  </Box>
-                </Grid>
-              ) : (
-                <></>
-              )}
-            </>
+                  ) : (
+                    <Box sx={{ padding: 2 }}>작성된 글이 없습니다.</Box>
+                  )}
+                </Box>
+              </Grid>
+            )}
           </Grid>
-        </Grid>
+        </>
       ) : (
         loggedOutContent
       )}

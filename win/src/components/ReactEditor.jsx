@@ -1,5 +1,5 @@
 import ReactQuill from "react-quill";
-import "react-quill/dist/quill.snow.css";
+import "./CSS/ReactEditor.css";
 
 const ReactEditor = ({ value, onChange, modules }) => {
   // 툴바에 표시할 모듈 설정
