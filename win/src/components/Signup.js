@@ -47,7 +47,7 @@ function Signup() {
           <Input
             type="text"
             name="fullname"
-            placeholder={errors.email ? "" : "이름을 입력하세요."}
+            placeholder={errors.fullname ? "" : "이름을 입력하세요."}
             value={formData.fullname}
             onChange={handleChange}
             onKeyDown={handleKeyDown}
@@ -68,7 +68,7 @@ function Signup() {
           <Input
             type="text"
             name="nickname"
-            placeholder={errors.email ? "" : "닉네임을 입력하세요."}
+            placeholder={errors.nickname ? "" : "닉네임을 입력하세요."}
             value={formData.nickname}
             onChange={handleChange}
             onKeyDown={handleKeyDown}
